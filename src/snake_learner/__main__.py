@@ -19,6 +19,9 @@ from snake_learner.plot_util import plot_field_history
 @click.option(
     "--reward-decay", type=float, default=0.15, help="Decay for moving"
 )
+@click.option(
+    "--epsilon", type=float, default=0.1, help="Policy epsilon"
+)
 def learn_snake(
     output_dir,
     rows,
@@ -28,6 +31,7 @@ def learn_snake(
     loss_penalty,
     eat_reward,
     reward_decay,
+    epsilon,
 ):
     output_dir = Path(output_dir)
     output_dir.mkdir(exist_ok=True)
@@ -38,6 +42,7 @@ def learn_snake(
         loss_penalty=loss_penalty,
         eat_reward=eat_reward,
         reward_decay=reward_decay,
+        epsilon=epsilon,
     )
     click.echo("Start learning...")
     with click.progressbar(length=iterations, show_pos=True) as bar:
