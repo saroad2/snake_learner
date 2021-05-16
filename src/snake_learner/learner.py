@@ -41,6 +41,10 @@ class SnakeLearner:
     def max_score(self):
         return np.max([history_point["score"] for history_point in self.history])
 
+    @property
+    def max_rewards_sum(self):
+        return np.max([history_point["rewards_sum"] for history_point in self.history])
+
     def run_iteration(self):
         board = SnakeBoard(rows=self.rows, columns=self.columns)
         count = 0

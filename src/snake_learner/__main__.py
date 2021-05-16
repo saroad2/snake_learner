@@ -20,8 +20,10 @@ def learn_snake(output_dir, iterations, plot_window):
     with click.progressbar(length=iterations, show_pos=True) as bar:
         for _ in bar:
             learner.run_iteration()
-            bar.label = f"Max score - {learner.max_score}"
-    click.echo(f"Max score = {learner.max_score}")
+            bar.label = (
+                f"Max score = {learner.max_score}, "
+                f"Max rewards sum - {learner.max_rewards_sum:.4f}"
+            )
     plot_field_history(
         history=learner.history,
         output_dir=output_dir,
