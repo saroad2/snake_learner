@@ -12,17 +12,32 @@ from snake_learner.plot_util import plot_field_history
     "--iterations", type=int, default=1_000, help="How many iterations to run."
 )
 @click.option("--plot-window", type=int, help="Windowing for plotting.")
-def learn_snake(output_dir, iterations, plot_window):
+@click.option("--loss-penalty", type=int, default=0, help="Penalty for losing.")
+@click.option("--eat-reward", type=int, default=1, help="Base reward for eating")
+@click.option(
+    "--reward-decay", type=float, default=0.15, help="Decay for moving"
+)
+def learn_snake(
+    output_dir, iterations, plot_window, loss_penalty, eat_reward, reward_decay
+):
     output_dir = Path(output_dir)
     output_dir.mkdir(exist_ok=True)
-    learner = SnakeLearner(rows=8, columns=8, sight_distance=3)
+    learner = SnakeLearner(
+        rows=8,
+        columns=8,
+        sight_distance=3,
+        loss_penalty=loss_penalty,
+        eat_reward=eat_reward,
+        reward_decay=reward_decay,
+    )
     click.echo("Start learning...")
     with click.progressbar(length=iterations, show_pos=True) as bar:
         for _ in bar:
             learner.run_iteration()
             bar.label = (
                 f"Max score = {learner.max_score}, "
-                f"Max rewards sum - {learner.max_rewards_sum:.4f}"
+                f"Max rewards sum - {learner.max_rewards_sum:.4f}, "
+                f"Longest duration - {learner.longest_duration}"
             )
     plot_field_history(
         history=learner.history,

@@ -19,7 +19,9 @@ class SnakeLearner:
         discount_factor=1,
         alpha=0.6,
         epsilon=0.1,
-        score_reward=0.15
+        reward_decay=0.15,
+        loss_penalty=0,
+        eat_reward=10,
     ):
         self.rows = rows
         self.columns = columns
@@ -29,7 +31,9 @@ class SnakeLearner:
         self.discount_factor = discount_factor
         self.alpha = alpha
         self.epsilon = epsilon
-        self.score_reward = score_reward
+        self.reward_decay = reward_decay
+        self.eat_reward = eat_reward
+        self.loss_penalty = loss_penalty
 
         self.history = []
 
@@ -45,12 +49,17 @@ class SnakeLearner:
     def max_rewards_sum(self):
         return np.max([history_point["rewards_sum"] for history_point in self.history])
 
+    @property
+    def longest_duration(self):
+        return np.max([history_point["duration"] for history_point in self.history])
+
     def run_iteration(self):
         board = SnakeBoard(rows=self.rows, columns=self.columns)
-        count = 0
+        iterations = 0
+        last_score_up = 0
         rewards_list = []
         while True:
-            count += 1
+            iterations += 1
 
             # get probabilities of all actions from current state
             state = self.view_getter.get_view(board)
@@ -64,8 +73,11 @@ class SnakeLearner:
             )
 
             # take action and get reward, transit to next state
-            reward = self.run_step(
-                board=board, direction=self.ACTIONS[action_index], count=count
+            reward, last_score_up = self.run_step(
+                board=board,
+                direction=self.ACTIONS[action_index],
+                iteration=iterations,
+                last_score_up=last_score_up
             )
             rewards_list.append(reward)
 
@@ -82,7 +94,7 @@ class SnakeLearner:
         self.history.append(
             dict(
                 score=board.score,
-                duration=count,
+                duration=iterations,
                 rewards_sum=np.sum(rewards_list),
                 rewards_max=np.max(rewards_list),
             )
@@ -96,14 +108,14 @@ class SnakeLearner:
         action_probabilities[best_action] += (1.0 - self.epsilon)
         return action_probabilities
 
-    def run_step(self, board, direction, count):
+    def run_step(self, board, direction, iteration, last_score_up):
         initial_score = board.score
 
         board.move(direction)
 
         new_score = board.score
         if new_score > initial_score:
-            return np.exp(self.score_reward * new_score)
+            return self.eat_reward * np.exp(self.reward_decay * new_score), iteration
         if board.done:
-            return 0
-        return np.exp(-self.score_reward * count)
+            return -self.loss_penalty, last_score_up
+        return np.exp(-self.reward_decay * (iteration - last_score_up)), last_score_up
