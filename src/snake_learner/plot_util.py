@@ -3,17 +3,30 @@ from matplotlib import pyplot as plt
 
 
 def plot_field_history(history, output_dir, field):
-    rewards = [history_point[field] for history_point in history]
-    rewards = moving_max(rewards)
-    x = np.arange(len(rewards))
+    values = [history_point[field] for history_point in history]
+    values = moving_max(values)
+    x = np.arange(len(values))
     fig, ax = plt.subplots()
 
-    ax.plot(x, rewards)
+    ax.plot(x, values)
     field_title = field.replace("_", " ").title()
     ax.set_title(f"{field_title} History")
     ax.set_xlabel("Time")
     ax.set_ylabel(field_title)
     fig.savefig(output_dir / f"{field}_history.png")
+
+
+def plot_int_field_histogram(history, output_dir, field):
+    values = [history_point[field] for history_point in history]
+    unique, counts = np.unique(values, return_counts=True)
+    fig, ax = plt.subplots()
+
+    ax.bar(unique, counts)
+    field_title = field.replace("_", " ").title()
+    ax.set_title(f"{field_title} Histogram")
+    ax.set_xlabel(field_title)
+    ax.set_ylabel("Count")
+    fig.savefig(output_dir / f"{field}_histogram.png")
 
 
 def moving_max(values):
