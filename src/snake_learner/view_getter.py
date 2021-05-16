@@ -52,8 +52,12 @@ class DistancesViewGetter(ViewGetter):
         distances = [
             self.get_distance(board, direction) for direction in self.DIRECTIONS
         ]
-        distances.extend(board.food - board.head)
-        return "".join([str(dist) for dist in distances])
+        food_vector = board.food - board.head
+        food_vector //= np.gcd(*food_vector)
+        return (
+            f"{'_'.join([str(dist) for dist in distances])}"
+            f":{food_vector[0]}_{food_vector[1]}"
+        )
 
     @classmethod
     def get_distance(cls, board, direction):
