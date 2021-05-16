@@ -1,13 +1,13 @@
 import numpy as np
 
 from snake_learner.board import SnakeBoard
-from snake_learner.view_getter import ViewGetter
+from snake_learner.view_getter import GridViewGetter
 
 
 def test_default_view():
     board = SnakeBoard(rows=8, columns=8)
     board.food = [0, 0]
-    view_getter = ViewGetter(sight_distance=2)
+    view_getter = GridViewGetter(sight_distance=2)
 
     assert view_getter.get_view(board) == (
         "     "
@@ -21,7 +21,7 @@ def test_default_view():
 def test_default_view_with_food():
     board = SnakeBoard(rows=8, columns=8)
     board.food = board.head + np.array([1, 2])
-    view_getter = ViewGetter(sight_distance=2)
+    view_getter = GridViewGetter(sight_distance=2)
 
     assert view_getter.get_view(board) == (
         "     "
@@ -40,7 +40,7 @@ def test_view_in_front_of_wall():
         [5, 6],
     ]
     board.food = board.head + np.array([2, 1])
-    view_getter = ViewGetter(sight_distance=2)
+    view_getter = GridViewGetter(sight_distance=2)
 
     assert view_getter.get_view(board) == (
         "    X"
@@ -59,7 +59,7 @@ def test_view_in_corner():
         [0, 7],
     ]
     board.food = [7, 0]
-    view_getter = ViewGetter(sight_distance=2)
+    view_getter = GridViewGetter(sight_distance=2)
 
     assert view_getter.get_view(board) == (
         "XXXXX"

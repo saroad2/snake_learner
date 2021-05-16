@@ -4,6 +4,7 @@ from pathlib import Path
 import click
 from snake_learner.learner import SnakeLearner
 from snake_learner.plot_util import plot_field_history
+from snake_learner.view_getter import DistancesViewGetter
 
 
 @click.command()
@@ -35,10 +36,11 @@ def learn_snake(
 ):
     output_dir = Path(output_dir)
     output_dir.mkdir(exist_ok=True)
+    view_getter = DistancesViewGetter()
     learner = SnakeLearner(
         rows=rows,
         columns=columns,
-        sight_distance=3,
+        view_getter=view_getter,
         loss_penalty=loss_penalty,
         eat_reward=eat_reward,
         reward_decay=reward_decay,

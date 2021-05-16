@@ -4,7 +4,7 @@ import numpy as np
 
 from snake_learner.board import SnakeBoard
 from snake_learner.direction import Direction
-from snake_learner.view_getter import ViewGetter
+from snake_learner.view_getter import GridViewGetter
 
 
 class SnakeLearner:
@@ -15,7 +15,7 @@ class SnakeLearner:
         self,
         rows,
         columns,
-        sight_distance,
+        view_getter,
         discount_factor=1,
         alpha=0.6,
         epsilon=0.1,
@@ -25,7 +25,7 @@ class SnakeLearner:
     ):
         self.rows = rows
         self.columns = columns
-        self.view_getter = ViewGetter(sight_distance=sight_distance)
+        self.view_getter = view_getter
         self.q = defaultdict(lambda: np.zeros(self.num_actions))
 
         self.discount_factor = discount_factor
