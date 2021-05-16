@@ -14,7 +14,6 @@ from snake_learner.view_getter import DistancesViewGetter
 @click.option(
     "--iterations", type=int, default=1_000, help="How many iterations to run."
 )
-@click.option("--plot-window", type=int, help="Windowing for plotting.")
 @click.option("--loss-penalty", type=int, default=0, help="Penalty for losing.")
 @click.option("--eat-reward", type=int, default=1, help="Base reward for eating")
 @click.option(
@@ -28,7 +27,6 @@ def learn_snake(
     rows,
     columns,
     iterations,
-    plot_window,
     loss_penalty,
     eat_reward,
     reward_decay,
@@ -59,25 +57,21 @@ def learn_snake(
         history=learner.history,
         output_dir=output_dir,
         field="rewards_sum",
-        window=plot_window,
     )
     plot_field_history(
         history=learner.history,
         output_dir=output_dir,
         field="rewards_max",
-        window=plot_window,
     )
     plot_field_history(
         history=learner.history,
         output_dir=output_dir,
         field="score",
-        window=plot_window,
     )
     plot_field_history(
         history=learner.history,
         output_dir=output_dir,
         field="duration",
-        window=plot_window,
     )
     with open(output_dir / "q_probabilities.json", mode="w") as fd:
         q_as_dict = {key: val.tolist() for key, val in learner.q.items()}
