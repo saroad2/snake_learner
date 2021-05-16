@@ -44,7 +44,7 @@ class SnakeLearner:
     def run_iteration(self):
         board = SnakeBoard(rows=self.rows, columns=self.columns)
         count = 0
-        rewards_sum = 0
+        rewards_list = []
         while True:
             count += 1
 
@@ -54,15 +54,16 @@ class SnakeLearner:
 
             # choose action according to
             # the probability distribution
-            action_index = np.random.choice(np.arange(
-                len(action_probabilities)),
-                p=action_probabilities)
+            action_index = np.random.choice(
+                np.arange(self.num_actions),
+                p=action_probabilities,
+            )
 
             # take action and get reward, transit to next state
             reward = self.run_step(
                 board=board, direction=self.ACTIONS[action_index], count=count
             )
-            rewards_sum += reward
+            rewards_list.append(reward)
 
             # TD Update
             next_state = self.view_getter.get_view(board)
@@ -75,7 +76,12 @@ class SnakeLearner:
             if board.done:
                 break
         self.history.append(
-            dict(score=board.score, duration=count, rewards=rewards_sum)
+            dict(
+                score=board.score,
+                duration=count,
+                rewards_sum=np.sum(rewards_list),
+                rewards_max=np.max(rewards_list),
+            )
         )
 
     def get_policy(self, state):
