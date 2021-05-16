@@ -118,4 +118,6 @@ class SnakeLearner:
             return self.eat_reward * np.exp(self.reward_decay * new_score), iteration
         if board.done:
             return -self.loss_penalty, last_score_up
-        return np.exp(-self.reward_decay * (iteration - last_score_up)), last_score_up
+        reward = np.exp(-self.reward_decay * (iteration - last_score_up))
+        reward /= np.linalg.norm(board.head - board.food)
+        return reward, last_score_up

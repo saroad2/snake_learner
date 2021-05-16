@@ -44,7 +44,7 @@ def learn_snake(
         for _ in bar:
             learner.run_iteration()
             bar.label = (
-                f"Max score = {learner.max_score}, "
+                f"Max score - {learner.max_score}, "
                 f"Max rewards sum - {learner.max_rewards_sum:.4f}, "
                 f"Longest duration - {learner.longest_duration}"
             )
