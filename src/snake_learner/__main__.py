@@ -8,6 +8,8 @@ from snake_learner.plot_util import plot_field_history
 
 @click.command()
 @click.argument("output-dir", type=click.Path(file_okay=False, dir_okay=True))
+@click.option("--rows", type=int, default=8, help="How many rows in board")
+@click.option("--columns", type=int, default=8, help="How many columns in board")
 @click.option(
     "--iterations", type=int, default=1_000, help="How many iterations to run."
 )
@@ -18,13 +20,20 @@ from snake_learner.plot_util import plot_field_history
     "--reward-decay", type=float, default=0.15, help="Decay for moving"
 )
 def learn_snake(
-    output_dir, iterations, plot_window, loss_penalty, eat_reward, reward_decay
+    output_dir,
+    rows,
+    columns,
+    iterations,
+    plot_window,
+    loss_penalty,
+    eat_reward,
+    reward_decay,
 ):
     output_dir = Path(output_dir)
     output_dir.mkdir(exist_ok=True)
     learner = SnakeLearner(
-        rows=8,
-        columns=8,
+        rows=rows,
+        columns=columns,
         sight_distance=3,
         loss_penalty=loss_penalty,
         eat_reward=eat_reward,
