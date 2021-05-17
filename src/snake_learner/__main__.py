@@ -23,6 +23,9 @@ from snake_learner.view_getter import DistancesViewGetter
 @click.option(
     "--epsilon", type=float, default=0.1, help="Policy epsilon"
 )
+@click.option(
+    "--sight-distance", type=int, help="How far can the snake see"
+)
 def learn_snake(
     output_dir,
     rows,
@@ -32,10 +35,11 @@ def learn_snake(
     eat_reward,
     reward_change,
     epsilon,
+    sight_distance,
 ):
     output_dir = Path(output_dir)
     output_dir.mkdir(exist_ok=True)
-    view_getter = DistancesViewGetter()
+    view_getter = DistancesViewGetter(sight_distance=sight_distance)
     learner = SnakeLearner(
         rows=rows,
         columns=columns,

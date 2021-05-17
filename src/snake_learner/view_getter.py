@@ -48,6 +48,9 @@ class DistancesViewGetter(ViewGetter):
         Direction.UP.to_array() + Direction.LEFT.to_array(),
     ]
 
+    def __init__(self, sight_distance=None):
+        self.sight_distance = sight_distance
+
     def get_view(self, board: SnakeBoard):
         distances = [
             self.get_distance(board, direction) for direction in self.DIRECTIONS
@@ -55,6 +58,8 @@ class DistancesViewGetter(ViewGetter):
         food_vector = board.food - board.head
         food_direction = self.get_closest_direction(food_vector)
         food_distance = int(np.sum(np.fabs(food_vector)))
+        if self.sight_distance is not None and food_distance > self.sight_distance:
+            food_distance = self.sight_distance
         return (
             f"{'_'.join([str(dist) for dist in distances])}"
             f":{food_direction}_{food_distance}"
@@ -68,11 +73,13 @@ class DistancesViewGetter(ViewGetter):
         ]
         return np.argmax(multiplications)
 
-    @classmethod
-    def get_distance(cls, board, direction):
+    def get_distance(self, board, direction):
         i = 0
         while True:
             loc = board.head + (i + 1) * direction
             if not board.is_valid_location(loc):
-                return i
+                break
             i += 1
+        if self.sight_distance is not None and i > self.sight_distance:
+            return self.sight_distance
+        return i
