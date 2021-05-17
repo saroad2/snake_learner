@@ -53,11 +53,20 @@ class DistancesViewGetter(ViewGetter):
             self.get_distance(board, direction) for direction in self.DIRECTIONS
         ]
         food_vector = board.food - board.head
-        food_vector //= np.gcd(*food_vector)
+        food_direction = self.get_closest_direction(food_vector)
+        food_distance = int(np.sum(np.fabs(food_vector)))
         return (
             f"{'_'.join([str(dist) for dist in distances])}"
-            f":{food_vector[0]}_{food_vector[1]}"
+            f":{food_direction}_{food_distance}"
         )
+
+    @classmethod
+    def get_closest_direction(cls, vector):
+        multiplications = [
+            np.dot(vector, direction) / (np.linalg.norm(vector) * np.linalg.norm(direction))
+            for direction in cls.DIRECTIONS
+        ]
+        return np.argmax(multiplications)
 
     @classmethod
     def get_distance(cls, board, direction):
