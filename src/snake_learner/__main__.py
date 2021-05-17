@@ -46,13 +46,21 @@ def learn_snake(
     )
     click.echo("Start learning...")
     with click.progressbar(length=iterations, show_pos=True) as bar:
-        for _ in bar:
-            learner.run_iteration()
-            bar.label = (
-                f"Max score - {learner.max_score}, "
-                f"Max rewards sum - {learner.max_rewards_sum:.4f}, "
-                f"Longest duration - {learner.longest_duration}"
-            )
+        try:
+            for _ in bar:
+                learner.run_iteration()
+                bar.label = (
+                    f"Max score - {learner.max_score}, "
+                    f"Max rewards sum - {learner.max_rewards_sum:.4f}, "
+                    f"Longest duration - {learner.longest_duration}"
+                )
+        except KeyboardInterrupt:
+            click.echo()
+            if not click.confirm(
+                "Training interrupted. Would you like to save the results?",
+                default=False
+            ):
+                return
     plot_field_history(
         history=learner.history,
         output_dir=output_dir,
