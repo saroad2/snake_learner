@@ -17,7 +17,7 @@ from snake_learner.view_getter import DistancesViewGetter
 @click.option("--loss-penalty", type=int, default=0, help="Penalty for losing.")
 @click.option("--eat-reward", type=int, default=1, help="Base reward for eating")
 @click.option(
-    "--reward-decay", type=float, default=0.15, help="Decay for moving"
+    "--reward-change", type=float, default=0.15, help="Reward change after n foods."
 )
 @click.option(
     "--epsilon", type=float, default=0.1, help="Policy epsilon"
@@ -29,7 +29,7 @@ def learn_snake(
     iterations,
     loss_penalty,
     eat_reward,
-    reward_decay,
+    reward_change,
     epsilon,
 ):
     output_dir = Path(output_dir)
@@ -41,7 +41,7 @@ def learn_snake(
         view_getter=view_getter,
         loss_penalty=loss_penalty,
         eat_reward=eat_reward,
-        reward_decay=reward_decay,
+        reward_change=reward_change,
         epsilon=epsilon,
     )
     click.echo("Start learning...")

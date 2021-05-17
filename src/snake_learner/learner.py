@@ -19,7 +19,7 @@ class SnakeLearner:
         discount_factor=1,
         alpha=0.6,
         epsilon=0.1,
-        reward_decay=0.15,
+        reward_change=0.15,
         loss_penalty=0,
         eat_reward=10,
     ):
@@ -31,7 +31,7 @@ class SnakeLearner:
         self.discount_factor = discount_factor
         self.alpha = alpha
         self.epsilon = epsilon
-        self.reward_decay = reward_decay
+        self.reward_change = reward_change
         self.eat_reward = eat_reward
         self.loss_penalty = loss_penalty
 
@@ -56,7 +56,6 @@ class SnakeLearner:
     def run_iteration(self):
         board = SnakeBoard(rows=self.rows, columns=self.columns)
         iterations = 0
-        last_score_up = 0
         rewards_list = []
         while True:
             iterations += 1
@@ -73,11 +72,8 @@ class SnakeLearner:
             )
 
             # take action and get reward, transit to next state
-            reward, last_score_up = self.run_step(
-                board=board,
-                direction=self.ACTIONS[action_index],
-                iteration=iterations,
-                last_score_up=last_score_up
+            reward = self.run_step(
+                board=board, direction=self.ACTIONS[action_index]
             )
             rewards_list.append(reward)
 
@@ -108,16 +104,16 @@ class SnakeLearner:
         action_probabilities[best_action] += (1.0 - self.epsilon)
         return action_probabilities
 
-    def run_step(self, board, direction, iteration, last_score_up):
+    def run_step(self, board, direction):
         initial_score = board.score
 
         board.move(direction)
 
         new_score = board.score
         if new_score > initial_score:
-            return self.eat_reward * np.exp(self.reward_decay * new_score), iteration
+            return self.eat_reward * np.exp(self.reward_change * new_score)
         if board.done:
-            return -self.loss_penalty, last_score_up
-        reward = np.exp(-self.reward_decay * (iteration - last_score_up))
-        reward /= np.linalg.norm(board.head - board.food)
-        return reward, last_score_up
+            return -self.loss_penalty
+        food_direction = board.food - board.head
+        food_distance = int(np.sum(np.fabs(food_direction)))
+        return 1 / food_distance
