@@ -29,6 +29,18 @@ def plot_int_field_histogram(history, output_dir, field):
     fig.savefig(output_dir / f"{field}_histogram.png")
 
 
+def plot_float_field_histogram(history, output_dir, field, bins):
+    values = [history_point[field] for history_point in history]
+    fig, ax = plt.subplots()
+
+    ax.hist(values, bins=bins)
+    field_title = field.replace("_", " ").title()
+    ax.set_title(f"{field_title} Histogram")
+    ax.set_xlabel(field_title)
+    ax.set_ylabel("Count")
+    fig.savefig(output_dir / f"{field}_histogram.png")
+
+
 def moving_max(values):
     new_values = []
     max_val = None

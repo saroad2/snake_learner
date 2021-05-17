@@ -3,7 +3,8 @@ from pathlib import Path
 
 import click
 from snake_learner.learner import SnakeLearner
-from snake_learner.plot_util import plot_field_history, plot_int_field_histogram
+from snake_learner.plot_util import plot_field_history, plot_int_field_histogram, \
+    plot_float_field_histogram
 from snake_learner.view_getter import DistancesViewGetter
 
 
@@ -65,6 +66,12 @@ def learn_snake(
         history=learner.history,
         output_dir=output_dir,
         field="rewards_sum",
+    )
+    plot_float_field_histogram(
+        history=learner.history,
+        output_dir=output_dir,
+        field="rewards_sum",
+        bins=50,
     )
     plot_field_history(
         history=learner.history,
