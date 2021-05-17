@@ -109,4 +109,4 @@ class SnakeLearner:
             return -self.loss_penalty
         food_direction = board.food - board.head
         food_distance = int(np.sum(np.fabs(food_direction)))
-        return 1 / food_distance
+        return np.power(2.0, 1 - food_distance)
