@@ -4,12 +4,9 @@ import numpy as np
 
 from snake_learner.board import SnakeBoard
 from snake_learner.direction import Direction
-from snake_learner.view_getter import GridViewGetter
 
 
 class SnakeLearner:
-
-    ACTIONS = [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT]
 
     def __init__(
         self,
@@ -26,7 +23,7 @@ class SnakeLearner:
         self.rows = rows
         self.columns = columns
         self.view_getter = view_getter
-        self.q = defaultdict(lambda: np.zeros(self.num_actions))
+        self.q = defaultdict(lambda: np.zeros(len(Direction)))
 
         self.discount_factor = discount_factor
         self.alpha = alpha
@@ -36,10 +33,6 @@ class SnakeLearner:
         self.loss_penalty = loss_penalty
 
         self.history = []
-
-    @property
-    def num_actions(self):
-        return len(self.ACTIONS)
 
     @property
     def max_score(self):
@@ -67,13 +60,13 @@ class SnakeLearner:
             # choose action according to
             # the probability distribution
             action_index = np.random.choice(
-                np.arange(self.num_actions),
+                np.arange(len(Direction)),
                 p=action_probabilities,
             )
 
             # take action and get reward, transit to next state
             reward = self.run_step(
-                board=board, direction=self.ACTIONS[action_index]
+                board=board, direction=Direction(action_index)
             )
             rewards_list.append(reward)
 
@@ -97,8 +90,8 @@ class SnakeLearner:
         )
 
     def get_policy(self, state):
-        action_probabilities = np.ones(self.num_actions,
-                                       dtype=float) * self.epsilon / self.num_actions
+        action_probabilities = np.ones(len(Direction),
+                                       dtype=float) * self.epsilon / len(Direction)
 
         best_action = np.argmax(self.q[state])
         action_probabilities[best_action] += (1.0 - self.epsilon)

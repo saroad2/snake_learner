@@ -11,10 +11,10 @@ TO_ARRAY = {
 
 
 class Direction(Enum):
-    UP = auto()
-    DOWN = auto()
-    RIGHT = auto()
-    LEFT = auto()
+    UP = 0
+    DOWN = 1
+    RIGHT = 2
+    LEFT = 3
 
     def to_array(self):
         return TO_ARRAY[self.name]
