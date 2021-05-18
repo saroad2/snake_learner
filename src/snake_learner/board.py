@@ -64,8 +64,9 @@ class SnakeBoard:
         self.snake.append(self.random_location())
         for _ in range(1, self.initial_size):
             new_head = self.head + np.random.choice(Direction).to_array()
-            if self.is_valid_location(new_head):
-                self.snake.append(new_head)
+            while not self.is_valid_location(new_head):
+                new_head = self.head + np.random.choice(Direction).to_array()
+            self.snake.append(new_head)
 
     def put_random_food(self):
         self.food = self.random_location()
