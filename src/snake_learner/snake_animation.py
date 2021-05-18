@@ -29,8 +29,8 @@ class SnakeAnimation:
 
         self.ax.cla()
 
-        self.ax.set_xlim(1, self.snake_board.shape[1])
-        self.ax.set_ylim(1, self.snake_board.shape[0])
+        self.ax.set_xlim(-2, self.snake_board.shape[1] + 2)
+        self.ax.set_ylim(-2, self.snake_board.shape[0] + 2)
         self.ax.set_title(f"Move {i} - Score {self.snake_board.score}")
 
         self.snake_scatter()
