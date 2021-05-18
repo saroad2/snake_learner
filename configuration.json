@@ -1,9 +1,10 @@
 {
   "rows": 16,
   "columns": 16,
+  "loss_change": 0.15,
+  "reward_change": 0.15,
   "loss_penalty": 1000,
   "eat_reward": 1000,
-  "reward_change": 0.15,
   "discount_factor": 0.5,
   "epsilon": 0.1,
   "alpha": 0.6,
