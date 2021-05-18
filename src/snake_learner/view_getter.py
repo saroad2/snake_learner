@@ -37,7 +37,7 @@ class GridViewGetter(ViewGetter):
 
 
 class DistancesViewGetter(ViewGetter):
-    DIRECTIONS = [
+    CROSS_DIRECTIONS = [
         Direction.UP.to_array(),
         Direction.UP.to_array() + Direction.RIGHT.to_array(),
         Direction.RIGHT.to_array(),
@@ -53,7 +53,7 @@ class DistancesViewGetter(ViewGetter):
 
     def get_view(self, board: SnakeBoard):
         distances = [
-            self.get_distance(board, direction) for direction in self.DIRECTIONS
+            self.get_distance(board, direction) for direction in self.CROSS_DIRECTIONS
         ]
         food_vector = board.food - board.head
         food_direction = self.get_closest_direction(food_vector)
@@ -68,8 +68,10 @@ class DistancesViewGetter(ViewGetter):
     @classmethod
     def get_closest_direction(cls, vector):
         multiplications = [
-            np.dot(vector, direction) / (np.linalg.norm(vector) * np.linalg.norm(direction))
-            for direction in cls.DIRECTIONS
+            np.dot(vector, direction.to_array()) / (
+                np.linalg.norm(vector) * np.linalg.norm(direction.to_array())
+            )
+            for direction in Direction
         ]
         return np.argmax(multiplications)
 
