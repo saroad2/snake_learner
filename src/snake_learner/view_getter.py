@@ -57,12 +57,8 @@ class DistancesViewGetter(ViewGetter):
         ]
         food_vector = board.food - board.head
         food_direction = self.get_closest_direction(food_vector)
-        food_distance = int(np.sum(np.fabs(food_vector)))
-        if self.sight_distance is not None and food_distance > self.sight_distance:
-            food_distance = self.sight_distance
         return (
-            f"{'_'.join([str(dist) for dist in distances])}"
-            f":{food_direction}_{food_distance}"
+            f"{'_'.join([str(dist) for dist in distances])}:{food_direction}"
         )
 
     @classmethod
