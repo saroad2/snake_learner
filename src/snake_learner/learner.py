@@ -86,6 +86,7 @@ class SnakeLearner:
                 duration=iterations,
                 rewards_sum=np.sum(rewards_list),
                 rewards_max=np.max(rewards_list),
+                states=len(self.q)
             )
         )
 

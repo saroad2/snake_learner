@@ -102,6 +102,12 @@ def learn_snake(
         output_dir=output_dir,
         field="duration",
     )
+    plot_field_history(
+        history=learner.history,
+        output_dir=output_dir,
+        field="states",
+        max_val=False,
+    )
     with open(output_dir / "q_probabilities.json", mode="w") as fd:
         q_as_dict = {key: val.tolist() for key, val in learner.q.items()}
         json.dump(q_as_dict, fd, indent=1)

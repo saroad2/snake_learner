@@ -2,9 +2,10 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def plot_field_history(history, output_dir, field):
+def plot_field_history(history, output_dir, field, max_val=True):
     values = [history_point[field] for history_point in history]
-    values = moving_max(values)
+    if max_val:
+        values = moving_max(values)
     x = np.arange(len(values))
     fig, ax = plt.subplots()
 
