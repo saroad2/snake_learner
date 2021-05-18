@@ -92,9 +92,7 @@ class SnakeLearner:
         )
 
         if update_q:
-            next_state = self.view_getter.get_view(board)
-            best_next_action = np.argmax(self.q[next_state])
-            td_target = reward + self.discount_factor * self.q[next_state][best_next_action]
+            td_target = reward + self.discount_factor * self.best_reward(board)
             td_delta = td_target - self.q[state][action_index]
             self.q[state][action_index] += self.alpha * td_delta
         return reward
@@ -120,3 +118,10 @@ class SnakeLearner:
         food_direction = board.food - board.head
         food_distance = int(np.sum(np.fabs(food_direction)))
         return np.power(2.0, 1 - food_distance)
+
+    def best_reward(self, board):
+        if board.done:
+            return 0
+        state = self.view_getter.get_view(board)
+        best_next_action = np.argmax(self.q[state])
+        return self.q[state][best_next_action]
