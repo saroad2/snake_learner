@@ -6,15 +6,12 @@ from snake_learner.direction import Direction
 
 class SnakeBoard:
 
-    def __init__(self, rows, columns):
+    def __init__(self, rows, columns, initial_size=3):
         self.shape = (rows, columns)
-        self.snake = [
-            np.array([rows // 2 - 2, columns // 2]),
-            np.array([rows // 2 - 1, columns // 2]),
-            np.array([rows // 2, columns // 2]),
-        ]
+        self.snake = []
         self.done = False
         self.food = None
+        self.initialize_snake(initial_size)
         self.put_random_food()
 
     @property
@@ -53,16 +50,25 @@ class SnakeBoard:
             return False
         return True
 
+    def initialize_snake(self, initial_size):
+        self.snake.append(self.random_location())
+        for _ in range(1, initial_size):
+            new_head = self.head + np.random.choice(Direction).to_array()
+            if self.is_valid_location(new_head):
+                self.snake.append(new_head)
+
     def put_random_food(self):
-        self.food = (
-            np.random.randint(self.shape[0]),
-            np.random.randint(self.shape[1]),
-        )
+        self.food = self.random_location()
         while self.location_in_snake(self.food):
-            self.food = (
+            self.food = self.random_location()
+
+    def random_location(self):
+        return np.array(
+            [
                 np.random.randint(self.shape[0]),
                 np.random.randint(self.shape[1]),
-            )
+            ]
+        )
 
     def location_in_snake(self, location, include_head=True):
         snake_cells = list(self.snake)
