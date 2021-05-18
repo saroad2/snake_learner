@@ -1,6 +1,3 @@
-from typing import List
-
-import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 
@@ -27,7 +24,7 @@ class SnakeAnimation:
 
     def update(self, i):
         if self.snake_board.done:
-            plt.close()
+            return
         self.learner.make_move(self.snake_board)
 
         self.ax.cla()
