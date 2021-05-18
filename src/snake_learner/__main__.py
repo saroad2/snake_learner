@@ -129,15 +129,21 @@ def train_snake(
     help="Configuration file",
     required=True,
 )
+@click.option("--rows", type=int, help="Override number of rows.")
+@click.option("--columns", type=int, help="Override number of columns.")
 @click.option(
     "-m", "--max-games", type=int, default=1, help="How many games to play."
 )
-def play_snake(q_file, configuration_file, max_games):
+def play_snake(q_file, configuration_file, rows, columns, max_games):
     with open(configuration_file, mode="r") as fd:
         configuration = json.load(fd)
     view_getter = DistancesViewGetter(
         sight_distance=configuration.pop("sight_distance")
     )
+    if rows is not None:
+        configuration["rows"] = rows
+    if columns is not None:
+        configuration["columns"] = columns
     learner = SnakeLearner(view_getter=view_getter, **configuration)
     learner.load_q_from_file(q_file)
     SnakeAnimation(learner=learner, max_games=max_games).play()
