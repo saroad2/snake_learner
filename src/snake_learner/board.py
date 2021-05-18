@@ -8,10 +8,11 @@ class SnakeBoard:
 
     def __init__(self, rows, columns, initial_size=3):
         self.shape = (rows, columns)
+        self.initial_size = initial_size
         self.snake = []
-        self.done = False
+        self.moves = 0
         self.food = None
-        self.initialize_snake(initial_size)
+        self.initialize_snake()
         self.put_random_food()
 
     @property
@@ -30,16 +31,25 @@ class SnakeBoard:
     def score(self):
         return len(self.snake)
 
+    @property
+    def done(self):
+        return not self.is_valid_location(self.head, include_head=False)
+
+    def restart(self):
+        self.snake = []
+        self.moves = 0
+        self.food = None
+        self.initialize_snake()
+        self.put_random_food()
+
     def move(self, direction: Direction):
+        self.moves += 1
         new_head = self.head + direction.to_array()
         self.snake.append(new_head)
         if np.array_equal(new_head, self.food):
             self.put_random_food()
         else:
             self.snake.popleft()
-        if not self.is_valid_location(location=self.head, include_head=False):
-            self.done = True
-            return
 
     def is_valid_location(self, location, include_head=True):
         if location[0] < 0 or location[0] >= self.shape[0]:
@@ -50,9 +60,9 @@ class SnakeBoard:
             return False
         return True
 
-    def initialize_snake(self, initial_size):
+    def initialize_snake(self):
         self.snake.append(self.random_location())
-        for _ in range(1, initial_size):
+        for _ in range(1, self.initial_size):
             new_head = self.head + np.random.choice(Direction).to_array()
             if self.is_valid_location(new_head):
                 self.snake.append(new_head)

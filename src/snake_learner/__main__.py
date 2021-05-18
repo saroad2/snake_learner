@@ -144,7 +144,10 @@ def train_snake(
 @click.option(
     "--sight-distance", type=int, help="How far can the snake see"
 )
-def play_snake(rows, columns, q_file, sight_distance, epsilon):
+@click.option(
+    "-m", "--max-games", type=int, default=1, help="How many games to play."
+)
+def play_snake(rows, columns, q_file, sight_distance, epsilon, max_games):
     view_getter = DistancesViewGetter(sight_distance=sight_distance)
     learner = SnakeLearner(
         rows=rows,
@@ -153,8 +156,7 @@ def play_snake(rows, columns, q_file, sight_distance, epsilon):
         epsilon=epsilon,
     )
     learner.load_q_from_file(q_file)
-    board = SnakeBoard(rows=rows, columns=columns)
-    SnakeAnimation(board=board, learner=learner).play()
+    SnakeAnimation(learner=learner, max_games=max_games).play()
 
 
 if __name__ == '__main__':

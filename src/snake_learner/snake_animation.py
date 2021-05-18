@@ -10,9 +10,11 @@ CREATURE_BASE_SIZE = 10
 
 class SnakeAnimation:
 
-    def __init__(self, learner: SnakeLearner, board: SnakeBoard):
+    def __init__(self, learner: SnakeLearner, max_games=1):
         self.learner = learner
-        self.snake_board = board
+        self.snake_board = SnakeBoard(rows=learner.rows, columns=learner.columns)
+        self.max_games = max_games
+        self.game = 1
         self.fig, self.ax = plt.subplots()
         self.anim = FuncAnimation(self.fig, self.update, interval=150)
 
@@ -24,14 +26,21 @@ class SnakeAnimation:
 
     def update(self, i):
         if self.snake_board.done:
-            return
+            if self.game >= self.max_games:
+                return
+            self.game += 1
+            self.snake_board.restart()
         self.learner.make_move(self.snake_board, update_q=False)
 
         self.ax.cla()
 
         self.ax.set_xlim(-2, self.snake_board.shape[1] + 2)
         self.ax.set_ylim(-2, self.snake_board.shape[0] + 2)
-        self.ax.set_title(f"Move {i} - Score {self.snake_board.score}")
+        self.ax.set_title(
+            f"Game {self.game}, "
+            f"Move {self.snake_board.moves}, "
+            f"Score {self.snake_board.score}"
+        )
 
         self.snake_scatter()
         self.food_scatter()
