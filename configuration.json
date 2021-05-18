@@ -3,6 +3,7 @@
   "columns": 16,
   "loss_change": 0.15,
   "reward_change": 0.15,
+  "distance_change": 1.2,
   "loss_penalty": 1000,
   "eat_reward": 1000,
   "discount_factor": 0.5,

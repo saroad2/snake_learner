@@ -19,6 +19,7 @@ class SnakeLearner:
         epsilon,
         loss_change,
         reward_change,
+        distance_change,
         loss_penalty,
         eat_reward,
     ):
@@ -32,6 +33,7 @@ class SnakeLearner:
         self.epsilon = epsilon
         self.loss_change = loss_change
         self.reward_change = reward_change
+        self.distance_change = distance_change
         self.eat_reward = eat_reward
         self.loss_penalty = loss_penalty
 
@@ -119,7 +121,7 @@ class SnakeLearner:
             return -self.loss_penalty * np.exp(self.loss_change * initial_score)
         food_direction = board.food - board.head
         food_distance = int(np.sum(np.fabs(food_direction)))
-        return np.power(2.0, 1 - food_distance)
+        return np.exp(-self.distance_change * food_distance)
 
     def best_reward(self, board):
         if board.done:
