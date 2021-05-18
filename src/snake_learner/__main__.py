@@ -150,8 +150,6 @@ def play_snake(rows, columns, q_file, sight_distance, epsilon):
     learner.load_q_from_file(q_file)
     board = SnakeBoard(rows=rows, columns=columns)
     SnakeAnimation(board=board, learner=learner).play()
-    for cell in board.snake:
-        print(cell)
 
 
 if __name__ == '__main__':

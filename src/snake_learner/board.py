@@ -35,21 +35,21 @@ class SnakeBoard:
 
     def move(self, direction: Direction):
         new_head = self.head + direction.to_array()
-        if not self.is_valid_location(location=new_head):
-            self.done = True
-            return
         self.snake.append(new_head)
         if np.array_equal(new_head, self.food):
             self.put_random_food()
         else:
             self.snake.popleft()
+        if not self.is_valid_location(location=self.head, include_head=False):
+            self.done = True
+            return
 
-    def is_valid_location(self, location):
+    def is_valid_location(self, location, include_head=True):
         if location[0] < 0 or location[0] >= self.shape[0]:
             return False
         if location[1] < 0 or location[1] >= self.shape[1]:
             return False
-        if self.location_in_snake(location):
+        if self.location_in_snake(location, include_head=include_head):
             return False
         return True
 
@@ -64,8 +64,11 @@ class SnakeBoard:
                 np.random.randint(self.shape[1]),
             )
 
-    def location_in_snake(self, location):
-        for snake_cell in self.snake:
-            if snake_cell[0] == location[0] and snake_cell[1] == location[1]:
+    def location_in_snake(self, location, include_head=True):
+        snake_cells = list(self.snake)
+        if not include_head:
+            snake_cells = snake_cells[:-1]
+        for snake_cell in snake_cells:
+            if np.array_equal(snake_cell, location):
                 return True
         return False
