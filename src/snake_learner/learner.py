@@ -1,3 +1,4 @@
+import json
 from collections import defaultdict
 
 import numpy as np
@@ -45,6 +46,11 @@ class SnakeLearner:
     @property
     def longest_duration(self):
         return np.max([history_point["duration"] for history_point in self.history])
+
+    def load_q_from_file(self, q_file_path):
+        with open(q_file_path, mode="r") as fd:
+            new_q = json.load(fd)
+        self.q.update({key: np.array(val) for key, val in new_q.items()})
 
     def run_iteration(self):
         board = SnakeBoard(rows=self.rows, columns=self.columns)

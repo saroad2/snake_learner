@@ -10,6 +10,11 @@ from snake_learner.view_getter import DistancesViewGetter
 
 @click.command()
 @click.argument("output-dir", type=click.Path(file_okay=False, dir_okay=True))
+@click.option(
+    "-q", "--q-file",
+    type=click.Path(exists=True, dir_okay=False),
+    help="Existing Q file to update",
+)
 @click.option("--rows", type=int, default=8, help="How many rows in board")
 @click.option("--columns", type=int, default=8, help="How many columns in board")
 @click.option(
@@ -28,6 +33,7 @@ from snake_learner.view_getter import DistancesViewGetter
 )
 def learn_snake(
     output_dir,
+    q_file,
     rows,
     columns,
     iterations,
@@ -49,6 +55,8 @@ def learn_snake(
         reward_change=reward_change,
         epsilon=epsilon,
     )
+    if q_file is not None:
+        learner.load_q_from_file(q_file)
     click.echo("Start learning...")
     with click.progressbar(length=iterations, show_pos=True) as bar:
         try:
@@ -108,7 +116,7 @@ def learn_snake(
         field="states",
         max_val=False,
     )
-    with open(output_dir / "q_probabilities.json", mode="w") as fd:
+    with open(output_dir / "q_values.json", mode="w") as fd:
         q_as_dict = {key: val.tolist() for key, val in learner.q.items()}
         json.dump(q_as_dict, fd, indent=1)
 
