@@ -9,6 +9,7 @@ class SnakeBoard:
     def __init__(self, rows, columns):
         self.shape = (rows, columns)
         self.snake = [
+            np.array([rows // 2 - 2, columns // 2]),
             np.array([rows // 2 - 1, columns // 2]),
             np.array([rows // 2, columns // 2]),
         ]
