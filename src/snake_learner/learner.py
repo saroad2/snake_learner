@@ -53,6 +53,25 @@ class SnakeLearner:
     def longest_duration(self):
         return np.max([history_point["duration"] for history_point in self.history])
 
+    @property
+    def states_number(self):
+        return len(self.q)
+
+    def recent_scores_mean(self, n=1_000):
+        return self.recent_field_mean(field="score", n=n)
+
+    def recent_rewards_mean(self, n=1_000):
+        return self.recent_field_mean(field="rewards_sum", n=n)
+
+    def recent_duration_mean(self, n=1_000):
+        return self.recent_field_mean(field="duration", n=n)
+
+    def recent_field_mean(self, field, n):
+        history = self.history
+        if len(history) > n:
+            history = history[-n:]
+        return np.mean([history_point[field] for history_point in history])
+
     def load_q_from_file(self, q_file_path):
         with open(q_file_path, mode="r") as fd:
             new_q = json.load(fd)
@@ -78,7 +97,7 @@ class SnakeLearner:
                 duration=iterations,
                 rewards_sum=np.sum(rewards_list),
                 rewards_max=np.max(rewards_list),
-                states=len(self.q)
+                states=self.states_number
             )
         )
 

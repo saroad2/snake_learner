@@ -59,9 +59,10 @@ def train_snake(
             for _ in bar:
                 learner.run_train_iteration()
                 bar.label = (
-                    f"Max score - {learner.max_score}, "
-                    f"Max rewards sum - {learner.max_rewards_sum:.4f}, "
-                    f"Longest duration - {learner.longest_duration}"
+                    f"Recent scores mean - {learner.recent_scores_mean():.2f}, "
+                    f"Recent rewards mean - {learner.recent_rewards_mean():.2f}, "
+                    f"Recent durations mean - {learner.recent_duration_mean():.2f}, "
+                    f"States - {learner.states_number}"
                 )
         except KeyboardInterrupt:
             click.echo()
