@@ -43,15 +43,15 @@ class SnakeLearner:
 
     @property
     def max_score(self):
-        return np.max([history_point["score"] for history_point in self.history])
+        return self.field_max("score")
 
     @property
-    def max_rewards_sum(self):
-        return np.max([history_point["rewards_sum"] for history_point in self.history])
+    def max_rewards(self):
+        return self.field_max("rewards")
 
     @property
     def longest_duration(self):
-        return np.max([history_point["duration"] for history_point in self.history])
+        return self.field_max("duration")
 
     @property
     def states_number(self):
@@ -61,12 +61,19 @@ class SnakeLearner:
         return self.recent_field_mean(field="score", n=n)
 
     def recent_rewards_mean(self, n=1_000):
-        return self.recent_field_mean(field="rewards_sum", n=n)
+        return self.recent_field_mean(field="rewards", n=n)
 
     def recent_duration_mean(self, n=1_000):
         return self.recent_field_mean(field="duration", n=n)
 
+    def field_max(self, field):
+        if len(self.history) == 0:
+            return None
+        return np.max([history_point[field] for history_point in self.history])
+
     def recent_field_mean(self, field, n):
+        if len(self.history) == 0:
+            return None
         history = self.history
         if len(history) > n:
             history = history[-n:]
@@ -79,14 +86,10 @@ class SnakeLearner:
 
     def run_train_iteration(self):
         board = SnakeBoard(rows=self.rows, columns=self.columns)
-        iterations = 0
-        rewards_list = []
+        rewards = 0
         while True:
-            iterations += 1
-
             reward = self.make_move(board)
-
-            rewards_list.append(reward)
+            rewards += reward
 
             # done is True if episode terminated
             if board.done:
@@ -94,10 +97,15 @@ class SnakeLearner:
         self.history.append(
             dict(
                 score=board.score,
-                duration=iterations,
-                rewards_sum=np.sum(rewards_list),
-                rewards_max=np.max(rewards_list),
-                states=self.states_number
+                duration=board.moves,
+                rewards=rewards,
+                recent_scores_mean=self.recent_scores_mean(),
+                recent_durations_mean=self.recent_scores_mean(),
+                recent_rewards_mean=self.recent_rewards_mean(),
+                max_score=self.max_score,
+                max_rewards=self.max_rewards,
+                longest_duration=self.longest_duration,
+                states=self.states_number,
             )
         )
 

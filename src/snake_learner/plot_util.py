@@ -2,10 +2,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def plot_field_history(history, output_dir, field, max_val=True):
+def plot_field_history(history, output_dir, field):
     values = [history_point[field] for history_point in history]
-    if max_val:
-        values = moving_max(values)
     x = np.arange(len(values))
     fig, ax = plt.subplots()
 
@@ -43,13 +41,3 @@ def plot_float_field_histogram(history, output_dir, field, bins):
     ax.set_xlabel(field_title)
     ax.set_ylabel("Count")
     fig.savefig(output_dir / f"{field}_histogram.png")
-
-
-def moving_max(values):
-    new_values = []
-    max_val = None
-    for val in values:
-        if max_val is None or val > max_val:
-            max_val = val
-        new_values.append(max_val)
-    return new_values

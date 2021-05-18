@@ -3,7 +3,6 @@ from pathlib import Path
 
 import click
 
-from snake_learner.board import SnakeBoard
 from snake_learner.learner import SnakeLearner
 from snake_learner.plot_util import plot_field_history, plot_int_field_histogram, \
     plot_float_field_histogram
@@ -74,23 +73,38 @@ def train_snake(
     plot_field_history(
         history=learner.history,
         output_dir=output_dir,
-        field="rewards_sum",
+        field="rewards",
+    )
+    plot_field_history(
+        history=learner.history,
+        output_dir=output_dir,
+        field="recent_rewards_mean",
+    )
+    plot_field_history(
+        history=learner.history,
+        output_dir=output_dir,
+        field="max_rewards",
     )
     plot_float_field_histogram(
         history=learner.history,
         output_dir=output_dir,
-        field="rewards_sum",
+        field="rewards",
         bins=50,
     )
     plot_field_history(
         history=learner.history,
         output_dir=output_dir,
-        field="rewards_max",
+        field="score",
     )
     plot_field_history(
         history=learner.history,
         output_dir=output_dir,
-        field="score",
+        field="recent_scores_mean",
+    )
+    plot_field_history(
+        history=learner.history,
+        output_dir=output_dir,
+        field="max_score",
     )
     plot_int_field_histogram(
         history=learner.history,
@@ -101,6 +115,16 @@ def train_snake(
         history=learner.history,
         output_dir=output_dir,
         field="duration",
+    )
+    plot_field_history(
+        history=learner.history,
+        output_dir=output_dir,
+        field="recent_durations_mean",
+    )
+    plot_field_history(
+        history=learner.history,
+        output_dir=output_dir,
+        field="longest_duration",
     )
     plot_int_field_histogram(
         history=learner.history,
@@ -111,7 +135,6 @@ def train_snake(
         history=learner.history,
         output_dir=output_dir,
         field="states",
-        max_val=False,
     )
     with open(output_dir / "q_values.json", mode="w") as fd:
         q_as_dict = {key: val.tolist() for key, val in learner.q.items()}
