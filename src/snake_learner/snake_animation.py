@@ -25,7 +25,7 @@ class SnakeAnimation:
     def update(self, i):
         if self.snake_board.done:
             return
-        self.learner.make_move(self.snake_board)
+        self.learner.make_move(self.snake_board, update_q=False)
 
         self.ax.cla()
 

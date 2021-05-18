@@ -52,18 +52,6 @@ class SnakeLearner:
             new_q = json.load(fd)
         self.q.update({key: np.array(val) for key, val in new_q.items()})
 
-    def make_move(self, board):
-        if board.done:
-            return
-        state = self.view_getter.get_view(board)
-        action_probabilities = self.get_policy(state)
-
-        action_index = np.random.choice(
-            np.arange(len(Direction)),
-            p=action_probabilities,
-        )
-        self.run_step(board=board, direction=Direction(action_index))
-
     def run_train_iteration(self):
         board = SnakeBoard(rows=self.rows, columns=self.columns)
         iterations = 0
@@ -71,29 +59,9 @@ class SnakeLearner:
         while True:
             iterations += 1
 
-            # get probabilities of all actions from current state
-            state = self.view_getter.get_view(board)
-            action_probabilities = self.get_policy(state)
+            reward = self.make_move(board)
 
-            # choose action according to
-            # the probability distribution
-            action_index = np.random.choice(
-                np.arange(len(Direction)),
-                p=action_probabilities,
-            )
-
-            # take action and get reward, transit to next state
-            reward = self.run_step(
-                board=board, direction=Direction(action_index)
-            )
             rewards_list.append(reward)
-
-            # TD Update
-            next_state = self.view_getter.get_view(board)
-            best_next_action = np.argmax(self.q[next_state])
-            td_target = reward + self.discount_factor * self.q[next_state][best_next_action]
-            td_delta = td_target - self.q[state][action_index]
-            self.q[state][action_index] += self.alpha * td_delta
 
             # done is True if episode terminated
             if board.done:
@@ -107,6 +75,29 @@ class SnakeLearner:
                 states=len(self.q)
             )
         )
+
+    def make_move(self, board, update_q=True):
+        # get probabilities of all actions from current state
+        state = self.view_getter.get_view(board)
+        action_probabilities = self.get_policy(state)
+        # choose action according to
+        # the probability distribution
+        action_index = np.random.choice(
+            np.arange(len(Direction)),
+            p=action_probabilities,
+        )
+        # take action and get reward, transit to next state
+        reward = self.run_step(
+            board=board, direction=Direction(action_index)
+        )
+
+        if update_q:
+            next_state = self.view_getter.get_view(board)
+            best_next_action = np.argmax(self.q[next_state])
+            td_target = reward + self.discount_factor * self.q[next_state][best_next_action]
+            td_delta = td_target - self.q[state][action_index]
+            self.q[state][action_index] += self.alpha * td_delta
+        return reward
 
     def get_policy(self, state):
         action_probabilities = np.ones(len(Direction),
