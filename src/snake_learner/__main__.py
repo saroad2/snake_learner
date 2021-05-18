@@ -34,6 +34,9 @@ def snake():
     "--reward-change", type=float, default=0.15, help="Reward change after n foods."
 )
 @click.option(
+    "--discount-factor", type=float, default=1.0, help="Discount facto for q update"
+)
+@click.option(
     "--epsilon", type=float, default=0.1, help="Policy epsilon"
 )
 @click.option(
@@ -48,6 +51,7 @@ def train_snake(
     loss_penalty,
     eat_reward,
     reward_change,
+    discount_factor,
     epsilon,
     sight_distance,
 ):
@@ -61,6 +65,7 @@ def train_snake(
         loss_penalty=loss_penalty,
         eat_reward=eat_reward,
         reward_change=reward_change,
+        discount_factor=discount_factor,
         epsilon=epsilon,
     )
     if q_file is not None:

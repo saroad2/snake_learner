@@ -14,7 +14,7 @@ class SnakeLearner:
         rows,
         columns,
         view_getter,
-        discount_factor=1,
+        discount_factor=1.0,
         alpha=0.6,
         epsilon=0.1,
         reward_change=0.15,
