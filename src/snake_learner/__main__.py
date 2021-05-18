@@ -2,13 +2,21 @@ import json
 from pathlib import Path
 
 import click
+
+from snake_learner.board import SnakeBoard
 from snake_learner.learner import SnakeLearner
 from snake_learner.plot_util import plot_field_history, plot_int_field_histogram, \
     plot_float_field_histogram
+from snake_learner.snake_animation import SnakeAnimation
 from snake_learner.view_getter import DistancesViewGetter
 
 
-@click.command()
+@click.group()
+def snake():
+    pass
+
+
+@snake.command("train")
 @click.argument("output-dir", type=click.Path(file_okay=False, dir_okay=True))
 @click.option(
     "-q", "--q-file",
@@ -31,7 +39,7 @@ from snake_learner.view_getter import DistancesViewGetter
 @click.option(
     "--sight-distance", type=int, help="How far can the snake see"
 )
-def learn_snake(
+def train_snake(
     output_dir,
     q_file,
     rows,
@@ -61,7 +69,7 @@ def learn_snake(
     with click.progressbar(length=iterations, show_pos=True) as bar:
         try:
             for _ in bar:
-                learner.run_iteration()
+                learner.run_train_iteration()
                 bar.label = (
                     f"Max score - {learner.max_score}, "
                     f"Max rewards sum - {learner.max_rewards_sum:.4f}, "
@@ -121,5 +129,30 @@ def learn_snake(
         json.dump(q_as_dict, fd, indent=1)
 
 
+@snake.command("play")
+@click.argument("q-file", type=click.Path(exists=True, dir_okay=False))
+@click.option("--rows", type=int, default=8, help="How many rows in board")
+@click.option("--columns", type=int, default=8, help="How many columns in board")
+@click.option(
+    "--epsilon", type=float, default=0.1, help="Policy epsilon"
+)
+@click.option(
+    "--sight-distance", type=int, help="How far can the snake see"
+)
+def play_snake(rows, columns, q_file, sight_distance, epsilon):
+    view_getter = DistancesViewGetter(sight_distance=sight_distance)
+    learner = SnakeLearner(
+        rows=rows,
+        columns=columns,
+        view_getter=view_getter,
+        epsilon=epsilon,
+    )
+    learner.load_q_from_file(q_file)
+    board = SnakeBoard(rows=rows, columns=columns)
+    SnakeAnimation(board=board, learner=learner).play()
+    for cell in board.snake:
+        print(cell)
+
+
 if __name__ == '__main__':
-    learn_snake()
+    snake()

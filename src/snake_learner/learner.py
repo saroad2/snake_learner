@@ -52,7 +52,19 @@ class SnakeLearner:
             new_q = json.load(fd)
         self.q.update({key: np.array(val) for key, val in new_q.items()})
 
-    def run_iteration(self):
+    def make_move(self, board):
+        if board.done:
+            return
+        state = self.view_getter.get_view(board)
+        action_probabilities = self.get_policy(state)
+
+        action_index = np.random.choice(
+            np.arange(len(Direction)),
+            p=action_probabilities,
+        )
+        self.run_step(board=board, direction=Direction(action_index))
+
+    def run_train_iteration(self):
         board = SnakeBoard(rows=self.rows, columns=self.columns)
         iterations = 0
         rewards_list = []
