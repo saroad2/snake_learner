@@ -14,12 +14,12 @@ class SnakeLearner:
         rows,
         columns,
         view_getter,
-        discount_factor=1.0,
-        alpha=0.6,
-        epsilon=0.1,
-        reward_change=0.15,
-        loss_penalty=0,
-        eat_reward=10,
+        discount_factor,
+        alpha,
+        epsilon,
+        reward_change,
+        loss_penalty,
+        eat_reward,
     ):
         self.rows = rows
         self.columns = columns

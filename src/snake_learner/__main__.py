@@ -17,57 +17,40 @@ def snake():
 
 
 @snake.command("train")
-@click.argument("output-dir", type=click.Path(file_okay=False, dir_okay=True))
+@click.option(
+    "-o", "--output-dir",
+    type=click.Path(file_okay=False, dir_okay=True),
+    required=True,
+    help="Output directory"
+)
+@click.option(
+    "-c", "--configuration-file",
+    type=click.Path(exists=True, dir_okay=False),
+    required=True,
+    help="Configuration file",
+)
+@click.option(
+    "--iterations", type=int, default=1_000, help="How many iterations to run."
+)
 @click.option(
     "-q", "--q-file",
     type=click.Path(exists=True, dir_okay=False),
     help="Existing Q file to update",
 )
-@click.option("--rows", type=int, default=8, help="How many rows in board")
-@click.option("--columns", type=int, default=8, help="How many columns in board")
-@click.option(
-    "--iterations", type=int, default=1_000, help="How many iterations to run."
-)
-@click.option("--loss-penalty", type=int, default=0, help="Penalty for losing.")
-@click.option("--eat-reward", type=int, default=1, help="Base reward for eating")
-@click.option(
-    "--reward-change", type=float, default=0.15, help="Reward change after n foods."
-)
-@click.option(
-    "--discount-factor", type=float, default=1.0, help="Discount facto for q update"
-)
-@click.option(
-    "--epsilon", type=float, default=0.1, help="Policy epsilon"
-)
-@click.option(
-    "--sight-distance", type=int, help="How far can the snake see"
-)
 def train_snake(
     output_dir,
     q_file,
-    rows,
-    columns,
+    configuration_file,
     iterations,
-    loss_penalty,
-    eat_reward,
-    reward_change,
-    discount_factor,
-    epsilon,
-    sight_distance,
 ):
     output_dir = Path(output_dir)
     output_dir.mkdir(exist_ok=True)
-    view_getter = DistancesViewGetter(sight_distance=sight_distance)
-    learner = SnakeLearner(
-        rows=rows,
-        columns=columns,
-        view_getter=view_getter,
-        loss_penalty=loss_penalty,
-        eat_reward=eat_reward,
-        reward_change=reward_change,
-        discount_factor=discount_factor,
-        epsilon=epsilon,
+    with open(configuration_file, mode="r") as fd:
+        configuration = json.load(fd)
+    view_getter = DistancesViewGetter(
+        sight_distance=configuration.pop("sight_distance")
     )
+    learner = SnakeLearner(view_getter=view_getter, **configuration)
     if q_file is not None:
         learner.load_q_from_file(q_file)
     click.echo("Start learning...")
@@ -135,26 +118,27 @@ def train_snake(
 
 
 @snake.command("play")
-@click.argument("q-file", type=click.Path(exists=True, dir_okay=False))
-@click.option("--rows", type=int, default=8, help="How many rows in board")
-@click.option("--columns", type=int, default=8, help="How many columns in board")
 @click.option(
-    "--epsilon", type=float, default=0.1, help="Policy epsilon"
+    "-q", "--q-file",
+    type=click.Path(exists=True, dir_okay=False),
+    help="Existing Q file to update",
 )
 @click.option(
-    "--sight-distance", type=int, help="How far can the snake see"
+    "-c", "--configuration-file",
+    type=click.Path(exists=True, dir_okay=False),
+    help="Configuration file",
+    required=True,
 )
 @click.option(
     "-m", "--max-games", type=int, default=1, help="How many games to play."
 )
-def play_snake(rows, columns, q_file, sight_distance, epsilon, max_games):
-    view_getter = DistancesViewGetter(sight_distance=sight_distance)
-    learner = SnakeLearner(
-        rows=rows,
-        columns=columns,
-        view_getter=view_getter,
-        epsilon=epsilon,
+def play_snake(q_file, configuration_file, max_games):
+    with open(configuration_file, mode="r") as fd:
+        configuration = json.load(fd)
+    view_getter = DistancesViewGetter(
+        sight_distance=configuration.pop("sight_distance")
     )
+    learner = SnakeLearner(view_getter=view_getter, **configuration)
     learner.load_q_from_file(q_file)
     SnakeAnimation(learner=learner, max_games=max_games).play()
 
