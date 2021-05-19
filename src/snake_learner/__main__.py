@@ -47,7 +47,7 @@ def train_snake(
     with open(configuration_file, mode="r") as fd:
         configuration = json.load(fd)
     view_getter = DistancesViewGetter(
-        sight_distance=configuration.pop("sight_distance")
+        sight_distance=configuration.pop("sight_distance", None)
     )
     learner = SnakeLearner(view_getter=view_getter, **configuration)
     if q_file is not None:
@@ -162,7 +162,7 @@ def play_snake(q_file, configuration_file, rows, columns, max_games):
     with open(configuration_file, mode="r") as fd:
         configuration = json.load(fd)
     view_getter = DistancesViewGetter(
-        sight_distance=configuration.pop("sight_distance")
+        sight_distance=configuration.pop("sight_distance", None)
     )
     if rows is not None:
         configuration["rows"] = rows
