@@ -7,6 +7,10 @@ from snake_learner.direction import Direction
 
 def test_board_constructor():
     board = SnakeBoard(rows=8, columns=8)
+    board.snake = [
+        [3, 4],
+        [4, 4],
+    ]
 
     np.testing.assert_array_equal(
         board.snake,
@@ -42,7 +46,7 @@ def test_move_down():
             [5, 4],
             [5, 5],
             [5, 6],
-            [6, 6],
+            [4, 6],
         ]
     )
     assert board.score == 5
@@ -66,7 +70,7 @@ def test_move_up():
             [4, 4],
             [4, 6],
             [4, 7],
-            [3, 7],
+            [5, 7],
         ]
     )
     assert board.score == 4

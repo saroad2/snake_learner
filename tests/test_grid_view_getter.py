@@ -4,8 +4,12 @@ from snake_learner.board import SnakeBoard
 from snake_learner.view_getter import GridViewGetter
 
 
-def test_default_view():
+def test_view():
     board = SnakeBoard(rows=8, columns=8)
+    board.snake = [
+        [3, 4],
+        [4, 4],
+    ]
     board.food = [0, 0]
     view_getter = GridViewGetter(sight_distance=2)
 
@@ -18,8 +22,12 @@ def test_default_view():
     )
 
 
-def test_default_view_with_food():
+def test_view_with_food():
     board = SnakeBoard(rows=8, columns=8)
+    board.snake = [
+        [3, 4],
+        [4, 4],
+    ]
     board.food = board.head + np.array([1, 2])
     view_getter = GridViewGetter(sight_distance=2)
 
