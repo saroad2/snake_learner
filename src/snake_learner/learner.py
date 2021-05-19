@@ -5,6 +5,7 @@ import numpy as np
 
 from snake_learner.board import SnakeBoard
 from snake_learner.direction import Direction
+from snake_learner.linalg_util import block_distance
 
 
 class SnakeLearner:
@@ -149,7 +150,7 @@ class SnakeLearner:
         if board.done:
             return -self.loss_penalty * np.exp(self.loss_change * initial_score)
         food_direction = board.food - board.head
-        food_distance = int(np.sum(np.fabs(food_direction)))
+        food_distance = block_distance(food_direction)
         return self.move_reward * np.exp(-self.distance_change * food_distance)
 
     def best_reward(self, board):

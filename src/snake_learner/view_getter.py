@@ -2,6 +2,7 @@ import numpy as np
 
 from snake_learner.board import SnakeBoard
 from snake_learner.direction import Direction
+from snake_learner.linalg_util import closest_direction
 
 
 class ViewGetter:
@@ -56,20 +57,10 @@ class DistancesViewGetter(ViewGetter):
             self.get_distance(board, direction) for direction in self.CROSS_DIRECTIONS
         ]
         food_vector = board.food - board.head
-        food_direction = self.get_closest_direction(food_vector)
+        food_direction = closest_direction(food_vector)
         return (
             f"{'_'.join([str(dist) for dist in distances])}:{food_direction}"
         )
-
-    @classmethod
-    def get_closest_direction(cls, vector):
-        multiplications = [
-            np.dot(vector, direction.to_array()) / (
-                np.linalg.norm(vector) * np.linalg.norm(direction.to_array())
-            )
-            for direction in Direction
-        ]
-        return np.argmax(multiplications)
 
     def get_distance(self, board, direction):
         i = 0
