@@ -4,7 +4,7 @@ from collections import defaultdict
 import numpy as np
 
 from snake_learner.board import SnakeBoard
-from snake_learner.direction import Direction
+from snake_learner.snake_action import SnakeAction
 from snake_learner.linalg_util import block_distance
 
 
@@ -28,7 +28,7 @@ class SnakeLearner:
         self.rows = rows
         self.columns = columns
         self.view_getter = view_getter
-        self.q = defaultdict(lambda: np.zeros(len(Direction)))
+        self.q = defaultdict(lambda: np.zeros(len(SnakeAction)))
 
         self.discount_factor = discount_factor
         self.alpha = alpha
@@ -117,12 +117,12 @@ class SnakeLearner:
         # choose action according to
         # the probability distribution
         action_index = np.random.choice(
-            np.arange(len(Direction)),
+            np.arange(len(SnakeAction)),
             p=action_probabilities,
         )
         # take action and get reward, transit to next state
         reward = self.run_step(
-            board=board, direction=Direction(action_index)
+            board=board, action=SnakeAction(action_index)
         )
 
         if update_q:
@@ -132,17 +132,18 @@ class SnakeLearner:
         return reward
 
     def get_policy(self, state):
-        action_probabilities = np.ones(len(Direction),
-                                       dtype=float) * self.epsilon / len(Direction)
+        action_probabilities = np.ones(
+            len(SnakeAction), dtype=float
+        ) * self.epsilon / len(SnakeAction)
 
         best_action = np.argmax(self.q[state])
         action_probabilities[best_action] += (1.0 - self.epsilon)
         return action_probabilities
 
-    def run_step(self, board, direction):
+    def run_step(self, board, action):
         initial_score = board.score
 
-        board.move(direction)
+        board.turn(action)
 
         new_score = board.score
         if new_score > initial_score:

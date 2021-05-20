@@ -2,6 +2,7 @@ import numpy as np
 from collections import deque
 
 from snake_learner.direction import Direction
+from snake_learner.snake_action import SnakeAction
 
 
 class SnakeBoard:
@@ -10,6 +11,7 @@ class SnakeBoard:
         self.shape = (rows, columns)
         self.initial_size = initial_size
         self.snake = []
+        self.direction = None
         self.moves = 0
         self.food = None
         self.initialize_snake()
@@ -37,10 +39,15 @@ class SnakeBoard:
 
     def restart(self):
         self.snake = []
+        self.direction = None
         self.moves = 0
         self.food = None
         self.initialize_snake()
         self.put_random_food()
+
+    def turn(self, action: SnakeAction):
+        self.direction = action.turn(self.direction)
+        self.move(self.direction)
 
     def move(self, direction: Direction):
         self.moves += 1
@@ -62,11 +69,24 @@ class SnakeBoard:
 
     def initialize_snake(self):
         self.snake.append(self.random_location())
-        for _ in range(1, self.initial_size):
-            new_head = self.head + np.random.choice(Direction).to_array()
-            while not self.is_valid_location(new_head):
-                new_head = self.head + np.random.choice(Direction).to_array()
-            self.snake.append(new_head)
+        self.direction = self.random_direction()
+        while len(self.snake) < self.initial_size:
+            actions = self.valid_actions()
+            if len(actions) == 0:
+                self.snake = [self.random_location()]
+                self.direction = self.random_direction()
+                continue
+            action = np.random.choice(actions)
+            self.direction = action.turn(self.direction)
+            self.snake.append(self.head + self.direction.to_array())
+
+    def valid_actions(self):
+        return [
+            action for action in SnakeAction
+            if self.is_valid_location(
+                self.head + action.turn(self.direction).to_array()
+            )
+        ]
 
     def put_random_food(self):
         self.food = self.random_location()
@@ -80,6 +100,10 @@ class SnakeBoard:
                 np.random.randint(self.shape[1]),
             ]
         )
+
+    @classmethod
+    def random_direction(cls):
+        return np.random.choice(Direction)
 
     def location_in_snake(self, location, include_head=True):
         snake_cells = list(self.snake)
