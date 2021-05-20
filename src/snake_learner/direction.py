@@ -12,8 +12,8 @@ TO_ARRAY = {
 
 class Direction(Enum):
     UP = 0
-    DOWN = 1
-    RIGHT = 2
+    RIGHT = 1
+    DOWN = 2
     LEFT = 3
 
     def to_array(self):
