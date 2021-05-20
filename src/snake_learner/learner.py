@@ -101,7 +101,7 @@ class SnakeLearner:
                 duration=board.moves,
                 rewards=rewards,
                 recent_scores_mean=self.recent_scores_mean(),
-                recent_durations_mean=self.recent_scores_mean(),
+                recent_durations_mean=self.recent_duration_mean(),
                 recent_rewards_mean=self.recent_rewards_mean(),
                 max_score=self.max_score,
                 max_rewards=self.max_rewards,
