@@ -12,7 +12,7 @@ class SnakeAnimation:
 
     def __init__(self, learner: SnakeLearner, max_games=1):
         self.learner = learner
-        self.snake_board = SnakeBoard(rows=learner.rows, columns=learner.columns)
+        self.snake_board = learner.build_board()
         self.max_games = max_games
         self.game = 1
         self.fig, self.ax = plt.subplots()

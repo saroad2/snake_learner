@@ -24,9 +24,11 @@ class SnakeLearner:
         loss_penalty,
         eat_reward,
         move_reward,
+        max_moves_to_score=None,
     ):
         self.rows = rows
         self.columns = columns
+        self.max_moves_to_score = max_moves_to_score
         self.view_getter = view_getter
         self.q = defaultdict(lambda: np.zeros(len(SnakeAction)))
 
@@ -85,8 +87,15 @@ class SnakeLearner:
             new_q = json.load(fd)
         self.q.update({key: np.array(val) for key, val in new_q.items()})
 
+    def build_board(self):
+        return SnakeBoard(
+            rows=self.rows,
+            columns=self.columns,
+            max_moves_to_score=self.max_moves_to_score,
+        )
+
     def run_train_iteration(self):
-        board = SnakeBoard(rows=self.rows, columns=self.columns)
+        board = self.build_board()
         rewards = 0
         while True:
             reward = self.make_move(board)
@@ -148,7 +157,7 @@ class SnakeLearner:
         new_score = board.score
         if new_score > initial_score:
             return self.eat_reward * np.exp(self.reward_change * new_score)
-        if board.done:
+        if board.lost:
             return -self.loss_penalty * np.exp(self.loss_change * initial_score)
         food_direction = board.food - board.head
         food_distance = block_distance(food_direction)

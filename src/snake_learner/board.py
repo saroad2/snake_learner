@@ -7,9 +7,10 @@ from snake_learner.snake_action import SnakeAction
 
 class SnakeBoard:
 
-    def __init__(self, rows, columns, initial_size=3):
+    def __init__(self, rows, columns, initial_size=3, max_moves_to_score=None):
         self.shape = (rows, columns)
         self.initial_size = initial_size
+        self.max_moves_to_score = max_moves_to_score
         self.snake = []
         self.direction = None
         self.moves = 0
@@ -35,6 +36,15 @@ class SnakeBoard:
 
     @property
     def done(self):
+        if (
+            self.max_moves_to_score is not None
+            and self.moves >= self.max_moves_to_score * self.score
+        ):
+            return True
+        return self.lost
+
+    @property
+    def lost(self):
         return not self.is_valid_location(self.head, include_head=False)
 
     def restart(self):
