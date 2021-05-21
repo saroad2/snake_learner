@@ -86,3 +86,4 @@ class DistancesViewGetter(ViewGetter):
             return self.sight_distance
         if coord < -self.sight_distance:
             return -self.sight_distance
+        return coord
