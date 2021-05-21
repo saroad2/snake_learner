@@ -1,18 +1,51 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
+from snake_learner.stat_util import moving_max, moving_mean
 
-def plot_field_history(history, output_dir, field):
-    values = [history_point[field] for history_point in history]
-    x = np.arange(len(values))
+
+def plot_values_history(values, title, xlabel, ylabel, output_path):
+    x = np.arange(np.array(values).shape[0])
     fig, ax = plt.subplots()
 
     ax.plot(x, values)
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    fig.savefig(output_path)
+
+
+def plot_field_history(history, output_dir, field):
     field_title = field.replace("_", " ").title()
-    ax.set_title(f"{field_title} History")
-    ax.set_xlabel("Time")
-    ax.set_ylabel(field_title)
-    fig.savefig(output_dir / f"{field}_history.png")
+    plot_values_history(
+        values=[history_point[field] for history_point in history],
+        title=f"{field_title} History",
+        xlabel="Time",
+        ylabel=field_title,
+        output_path=output_dir / f"{field}_history.png"
+    )
+
+
+def plot_max_field_history(history, output_dir, field):
+    field_title = field.replace("_", " ").title()
+    plot_values_history(
+        values=moving_max([history_point[field] for history_point in history]),
+        title=f"Max {field_title} History",
+        xlabel="Time",
+        ylabel=field_title,
+        output_path=output_dir / f"max_{field}_history.png"
+    )
+
+
+def plot_recent_mean_field_history(history, output_dir, field, n):
+    field_title = field.replace("_", " ").title()
+    plot_values_history(
+        values=moving_mean([history_point[field] for history_point in history], n=n),
+        title=f"{field_title} Recent Mean History (Window Size={n})",
+        xlabel="Time",
+        ylabel=field_title,
+        output_path=output_dir / f"{field}_recent_mean_history.png"
+    )
 
 
 def plot_int_field_histogram(history, output_dir, field):

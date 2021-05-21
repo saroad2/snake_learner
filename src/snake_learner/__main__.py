@@ -6,7 +6,7 @@ import click
 
 from snake_learner.learner import SnakeLearner
 from snake_learner.plot_util import plot_field_history, plot_int_field_histogram, \
-    plot_float_field_histogram
+    plot_float_field_histogram, plot_recent_mean_field_history, plot_max_field_history
 from snake_learner.snake_animation import SnakeAnimation
 from snake_learner.view_getter import DistancesViewGetter
 
@@ -37,11 +37,18 @@ def snake():
     type=click.Path(exists=True, dir_okay=False),
     help="Existing Q file to update",
 )
+@click.option(
+    "-p", "--plot-window",
+    type=int,
+    default=1000,
+    help="Window size for mean calculation in plots",
+)
 def train_snake(
     output_dir,
     q_file,
     configuration_file,
     iterations,
+    plot_window,
 ):
     output_dir = Path(output_dir)
     output_dir.mkdir(exist_ok=True)
@@ -76,15 +83,16 @@ def train_snake(
         output_dir=output_dir,
         field="rewards",
     )
-    plot_field_history(
+    plot_recent_mean_field_history(
         history=learner.history,
         output_dir=output_dir,
-        field="recent_rewards_mean",
+        field="rewards",
+        n=plot_window,
     )
-    plot_field_history(
+    plot_max_field_history(
         history=learner.history,
         output_dir=output_dir,
-        field="max_rewards",
+        field="rewards",
     )
     plot_float_field_histogram(
         history=learner.history,
@@ -97,15 +105,16 @@ def train_snake(
         output_dir=output_dir,
         field="score",
     )
-    plot_field_history(
+    plot_recent_mean_field_history(
         history=learner.history,
         output_dir=output_dir,
-        field="recent_scores_mean",
+        field="score",
+        n=plot_window,
     )
-    plot_field_history(
+    plot_max_field_history(
         history=learner.history,
         output_dir=output_dir,
-        field="max_score",
+        field="score",
     )
     plot_int_field_histogram(
         history=learner.history,
@@ -117,15 +126,16 @@ def train_snake(
         output_dir=output_dir,
         field="duration",
     )
-    plot_field_history(
+    plot_recent_mean_field_history(
         history=learner.history,
         output_dir=output_dir,
-        field="recent_durations_mean",
+        field="duration",
+        n=plot_window,
     )
-    plot_field_history(
+    plot_max_field_history(
         history=learner.history,
         output_dir=output_dir,
-        field="longest_duration",
+        field="duration",
     )
     plot_int_field_histogram(
         history=learner.history,
