@@ -15,11 +15,11 @@ class SnakeAnimation:
         self.history = history
         self.fig, self.ax = plt.subplots()
         self.anim = FuncAnimation(
-            self.fig, self.update, frames=len(self.history), interval=150
+            self.fig, self.update, frames=len(self.history), interval=200
         )
 
     def save(self, output):
-        self.anim.save(output)
+        self.anim.save(str(output))
 
     def play(self):
         plt.show()

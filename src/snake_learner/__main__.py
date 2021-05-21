@@ -155,10 +155,22 @@ def train_snake(
     help="Configuration file",
     required=True,
 )
+@click.option(
+    "-o", "--output-dir",
+    type=click.Path(file_okay=False, dir_okay=True),
+    help="Output directory"
+)
 @click.option("--rows", type=int, help="Override number of rows.")
 @click.option("--columns", type=int, help="Override number of columns.")
 @click.option("-b", "--best-of", type=int, help="Show best of n games")
-def play_snake(q_file, configuration_file, rows, columns, best_of):
+@click.option(
+    "--output-type",
+    type=click.Choice(["gif", "mp4"], case_sensitive=False),
+    default="gif"
+)
+def play_snake(
+    q_file, configuration_file, output_dir, rows, columns, best_of, output_type
+):
     with open(configuration_file, mode="r") as fd:
         configuration = json.load(fd)
     view_getter = DistancesViewGetter(
@@ -173,9 +185,15 @@ def play_snake(q_file, configuration_file, rows, columns, best_of):
     if best_of is None:
         board = learner.play()
     else:
+        click.echo(f"Look for best game of {best_of} games")
         boards = [learner.play() for _ in range(best_of)]
         board = max(boards, key=lambda b: b.score)
-    SnakeAnimation(history=board.history).play()
+        click.echo(f"Found game with score {board.score}")
+    animation = SnakeAnimation(history=board.history)
+    if output_dir is None:
+        animation.play()
+    else:
+        animation.save(Path(output_dir) / f"snake_game.{output_type}")
 
 
 if __name__ == '__main__':
