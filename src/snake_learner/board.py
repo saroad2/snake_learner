@@ -1,18 +1,21 @@
 import numpy as np
 from collections import deque
+from copy import deepcopy
 
 from snake_learner.direction import Direction
+from snake_learner.history import HistoryPoint
 from snake_learner.snake_action import SnakeAction
 
 
 class SnakeBoard:
 
     def __init__(self, rows, columns, initial_size=3, max_moves_to_score=None):
-        self.shape = (rows, columns)
+        self.shape = np.array([rows, columns])
         self.initial_size = initial_size
         self.max_moves_to_score = max_moves_to_score
         self.snake = []
         self.direction = None
+        self.history = []
         self.moves = 0
         self.food = None
         self.initialize_snake()
@@ -52,6 +55,7 @@ class SnakeBoard:
         self.direction = None
         self.moves = 0
         self.food = None
+        self.history = []
         self.initialize_snake()
         self.put_random_food()
 
@@ -67,6 +71,14 @@ class SnakeBoard:
             self.put_random_food()
         else:
             self.snake.popleft()
+        self.history.append(
+            HistoryPoint(
+                shape=self.shape,
+                snake=list(deepcopy(self.snake)),
+                moves=self.moves,
+                food=deepcopy(self.food)
+            )
+        )
 
     def is_valid_location(self, location, include_head=True):
         if location[0] < 0 or location[0] >= self.shape[0]:

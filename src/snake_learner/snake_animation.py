@@ -1,8 +1,9 @@
+from typing import List
+
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-from snake_learner.board import SnakeBoard
-from snake_learner.learner import SnakeLearner
+from snake_learner.history import HistoryPoint
 
 FOOD_BASE_SIZE = 7
 CREATURE_BASE_SIZE = 10
@@ -10,13 +11,12 @@ CREATURE_BASE_SIZE = 10
 
 class SnakeAnimation:
 
-    def __init__(self, learner: SnakeLearner, max_games=1):
-        self.learner = learner
-        self.snake_board = learner.build_board()
-        self.max_games = max_games
-        self.game = 1
+    def __init__(self, history: List[HistoryPoint]):
+        self.history = history
         self.fig, self.ax = plt.subplots()
-        self.anim = FuncAnimation(self.fig, self.update, interval=150)
+        self.anim = FuncAnimation(
+            self.fig, self.update, frames=len(self.history), interval=150
+        )
 
     def save(self, output):
         self.anim.save(output)
@@ -25,36 +25,37 @@ class SnakeAnimation:
         plt.show()
 
     def update(self, i):
-        if self.snake_board.done:
-            if self.game >= self.max_games:
-                return
-            self.game += 1
-            self.snake_board.restart()
-        self.learner.make_move(self.snake_board, update_q=False)
+        if i >= len(self.history):
+            return
+        history_point = self.history[i]
 
         self.ax.cla()
 
-        self.ax.set_xlim(-2, self.snake_board.shape[1] + 2)
-        self.ax.set_ylim(-2, self.snake_board.shape[0] + 2)
+        rows, columns = history_point.shape
+        self.ax.set_xlim(-1, columns)
+        self.ax.set_ylim(-1, rows)
+        self.ax.hlines(rows, -1, columns, color="black")
+        self.ax.hlines(-1, -1, columns, color="black")
+        self.ax.vlines(rows, -1, rows, color="black")
+        self.ax.vlines(-1, -1, rows, color="black")
         self.ax.set_title(
-            f"Game {self.game}, "
-            f"Move {self.snake_board.moves}, "
-            f"Score {self.snake_board.score}"
+            f"Move {history_point.moves}/{len(self.history)}, "
+            f"Score {history_point.score}"
         )
 
-        self.snake_scatter()
-        self.food_scatter()
+        self.snake_scatter(history_point)
+        self.food_scatter(history_point)
 
-    def food_scatter(self):
+    def food_scatter(self, history_point):
         self.ax.scatter(
-            [self.snake_board.food[1]], [self.snake_board.food[0]], c="orange"
+            [history_point.food[1]], [history_point.food[0]], c="orange"
         )
 
-    def snake_scatter(self):
-        snake_cells_without_head = list(self.snake_board.snake)[:-1]
+    def snake_scatter(self, history_point: HistoryPoint):
+        snake_cells_without_head = list(history_point.snake)[:-1]
         snake_cell_x = [cell[1] for cell in snake_cells_without_head]
         snake_cell_y = [cell[0] for cell in snake_cells_without_head]
         self.ax.scatter(snake_cell_x, snake_cell_y, c="green")
         self.ax.scatter(
-            [self.snake_board.head[1]], [self.snake_board.head[0]], c="blue"
+            [history_point.head[1]], [history_point.head[0]], c="blue"
         )

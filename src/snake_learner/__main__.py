@@ -157,10 +157,8 @@ def train_snake(
 )
 @click.option("--rows", type=int, help="Override number of rows.")
 @click.option("--columns", type=int, help="Override number of columns.")
-@click.option(
-    "-m", "--max-games", type=int, default=1, help="How many games to play."
-)
-def play_snake(q_file, configuration_file, rows, columns, max_games):
+@click.option("-b", "--best-of", type=int, help="Show best of n games")
+def play_snake(q_file, configuration_file, rows, columns, best_of):
     with open(configuration_file, mode="r") as fd:
         configuration = json.load(fd)
     view_getter = DistancesViewGetter(
@@ -172,7 +170,12 @@ def play_snake(q_file, configuration_file, rows, columns, max_games):
         configuration["columns"] = columns
     learner = SnakeLearner(view_getter=view_getter, **configuration)
     learner.load_q_from_file(q_file)
-    SnakeAnimation(learner=learner, max_games=max_games).play()
+    if best_of is None:
+        board = learner.play()
+    else:
+        boards = [learner.play() for _ in range(best_of)]
+        board = max(boards, key=lambda b: b.score)
+    SnakeAnimation(history=board.history).play()
 
 
 if __name__ == '__main__':

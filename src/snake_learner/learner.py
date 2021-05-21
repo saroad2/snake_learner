@@ -119,6 +119,12 @@ class SnakeLearner:
             )
         )
 
+    def play(self):
+        board = self.build_board()
+        while not board.done:
+            self.make_move(board)
+        return board
+
     def make_move(self, board, update_q=True):
         # get probabilities of all actions from current state
         state = self.view_getter.get_view(board)
