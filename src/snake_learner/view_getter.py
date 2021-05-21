@@ -2,7 +2,7 @@ import numpy as np
 
 from snake_learner.board import SnakeBoard
 from snake_learner.direction import Direction
-from snake_learner.linalg_util import closest_direction
+from snake_learner.linalg_util import closest_direction, project_to_direction
 from snake_learner.snake_action import SnakeAction
 
 
@@ -49,10 +49,13 @@ class DistancesViewGetter(ViewGetter):
             for direction in self.get_cross_directions(board.direction)
         ]
         food_vector = board.food - board.head
-        food_direction = closest_direction(food_vector)
-        food_direction = (food_direction.value - board.direction.value) % len(Direction)
+        food_vector = project_to_direction(
+            sight_vector=food_vector, direction=board.direction
+        )
         return (
-            f"{'_'.join([str(dist) for dist in distances])}:{food_direction}"
+            f"{'_'.join([str(dist) for dist in distances])}:"
+            f"{self.normalize_coordinate(food_vector[0])}_"
+            f"{self.normalize_coordinate(food_vector[1])}"
         )
 
     @classmethod
@@ -62,7 +65,6 @@ class DistancesViewGetter(ViewGetter):
             direction.to_array() + SnakeAction.TURN_RIGHT.turn(direction).to_array(),
             SnakeAction.TURN_RIGHT.turn(direction).to_array(),
             -direction.to_array() + SnakeAction.TURN_RIGHT.turn(direction).to_array(),
-            -direction.to_array(),
             -direction.to_array() + SnakeAction.TURN_LEFT.turn(direction).to_array(),
             SnakeAction.TURN_LEFT.turn(direction).to_array(),
             direction.to_array() + SnakeAction.TURN_LEFT.turn(direction).to_array(),
@@ -75,6 +77,12 @@ class DistancesViewGetter(ViewGetter):
             if not board.is_valid_location(loc):
                 break
             i += 1
-        if self.sight_distance is not None and i > self.sight_distance:
+        return self.normalize_coordinate(i)
+
+    def normalize_coordinate(self, coord):
+        if self.sight_distance is None:
+            return coord
+        if coord > self.sight_distance:
             return self.sight_distance
-        return i
+        if coord < -self.sight_distance:
+            return -self.sight_distance
