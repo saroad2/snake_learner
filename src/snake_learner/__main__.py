@@ -145,6 +145,28 @@ def train_snake(
     plot_field_history(
         history=learner.history,
         output_dir=output_dir,
+        field="velocity",
+    )
+    plot_recent_mean_field_history(
+        history=learner.history,
+        output_dir=output_dir,
+        field="velocity",
+        n=plot_window,
+    )
+    plot_max_field_history(
+        history=learner.history,
+        output_dir=output_dir,
+        field="velocity",
+    )
+    plot_float_field_histogram(
+        history=learner.history,
+        output_dir=output_dir,
+        field="velocity",
+        bins=50,
+    )
+    plot_field_history(
+        history=learner.history,
+        output_dir=output_dir,
         field="states",
     )
     shutil.copyfile(configuration_file, output_dir / "configuration.json")

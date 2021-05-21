@@ -110,6 +110,7 @@ class SnakeLearner:
                 duration=board.moves,
                 rewards=rewards,
                 states=self.states_number,
+                velocity=board.score / board.moves,
             )
         )
 
