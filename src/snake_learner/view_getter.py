@@ -3,6 +3,7 @@ import numpy as np
 from snake_learner.board import SnakeBoard
 from snake_learner.direction import Direction
 from snake_learner.linalg_util import closest_direction
+from snake_learner.snake_action import SnakeAction
 
 
 class ViewGetter:
@@ -38,29 +39,34 @@ class GridViewGetter(ViewGetter):
 
 
 class DistancesViewGetter(ViewGetter):
-    CROSS_DIRECTIONS = [
-        Direction.UP.to_array(),
-        Direction.UP.to_array() + Direction.RIGHT.to_array(),
-        Direction.RIGHT.to_array(),
-        Direction.DOWN.to_array() + Direction.RIGHT.to_array(),
-        Direction.DOWN.to_array(),
-        Direction.DOWN.to_array() + Direction.LEFT.to_array(),
-        Direction.LEFT.to_array(),
-        Direction.UP.to_array() + Direction.LEFT.to_array(),
-    ]
 
     def __init__(self, sight_distance=None):
         self.sight_distance = sight_distance
 
     def get_view(self, board: SnakeBoard):
         distances = [
-            self.get_distance(board, direction) for direction in self.CROSS_DIRECTIONS
+            self.get_distance(board, direction)
+            for direction in self.get_cross_directions(board.direction)
         ]
         food_vector = board.food - board.head
         food_direction = closest_direction(food_vector)
+        food_direction = (food_direction.value - board.direction.value) % len(Direction)
         return (
             f"{'_'.join([str(dist) for dist in distances])}:{food_direction}"
         )
+
+    @classmethod
+    def get_cross_directions(cls, direction: Direction):
+        return [
+            direction.to_array(),
+            direction.to_array() + SnakeAction.TURN_RIGHT.turn(direction).to_array(),
+            SnakeAction.TURN_RIGHT.turn(direction).to_array(),
+            -direction.to_array() + SnakeAction.TURN_RIGHT.turn(direction).to_array(),
+            -direction.to_array(),
+            -direction.to_array() + SnakeAction.TURN_LEFT.turn(direction).to_array(),
+            SnakeAction.TURN_LEFT.turn(direction).to_array(),
+            direction.to_array() + SnakeAction.TURN_LEFT.turn(direction).to_array(),
+        ]
 
     def get_distance(self, board, direction):
         i = 0
