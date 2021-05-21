@@ -1,4 +1,5 @@
 import json
+import shutil
 from pathlib import Path
 
 import click
@@ -136,6 +137,7 @@ def train_snake(
         output_dir=output_dir,
         field="states",
     )
+    shutil.copyfile(configuration_file, output_dir / "configuration.json")
     with open(output_dir / "q_values.json", mode="w") as fd:
         q_as_dict = {key: val.tolist() for key, val in learner.q.items()}
         json.dump(q_as_dict, fd, indent=1)
