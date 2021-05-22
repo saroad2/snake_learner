@@ -6,7 +6,8 @@ import click
 
 from snake_learner.learner import SnakeLearner
 from snake_learner.plot_util import plot_field_history, plot_int_field_histogram, \
-    plot_float_field_histogram, plot_recent_mean_field_history, plot_max_field_history
+    plot_float_field_histogram, plot_recent_mean_field_history, plot_max_field_history, \
+    plot_values_histogram
 from snake_learner.snake_animation import SnakeAnimation
 from snake_learner.view_getter import DistancesViewGetter
 
@@ -44,9 +45,20 @@ def snake():
     help="Window size for mean calculation in plots",
 )
 @click.option(
+    "--animate/--no-animate",
+    is_flag=True,
+    default=True,
+    help="Should animate best game"
+)
+@click.option(
     "--animation-output-type",
     type=click.Choice(["gif", "mp4"], case_sensitive=False),
     default="gif"
+)
+@click.option(
+    "--min-state-strength",
+    type=float,
+    help="Minimum strength for state to be saved"
 )
 def train_snake(
     output_dir,
@@ -54,7 +66,9 @@ def train_snake(
     configuration_file,
     iterations,
     plot_window,
+    animate,
     animation_output_type,
+    min_state_strength,
 ):
     output_dir = Path(output_dir)
     output_dir.mkdir(exist_ok=True)
@@ -87,6 +101,8 @@ def train_snake(
                 default=False
             ):
                 return
+    if min_state_strength is not None:
+        learner.clear_states_by_strength(min_state_strength)
     plot_field_history(
         history=learner.history,
         output_dir=output_dir,
@@ -178,9 +194,17 @@ def train_snake(
         output_dir=output_dir,
         field="states",
     )
-    SnakeAnimation(history=learner.best_game.history).save(
-        Path(output_dir) / f"snake_game.{animation_output_type}"
+    plot_values_histogram(
+        values=learner.state_strengths,
+        title="Strength histogram",
+        xlabel="Strength",
+        bins=50,
+        output_path=output_dir / "q_strength_histogram.png"
     )
+    if animate:
+        SnakeAnimation(history=learner.best_game.history).save(
+            Path(output_dir) / f"snake_game.{animation_output_type}"
+        )
     shutil.copyfile(configuration_file, output_dir / "configuration.json")
     with open(output_dir / "q_values.json", mode="w") as fd:
         q_as_dict = {key: val.tolist() for key, val in learner.q.items()}

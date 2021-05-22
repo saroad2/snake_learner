@@ -61,6 +61,10 @@ class SnakeLearner:
     def states_number(self):
         return len(self.q)
 
+    @property
+    def state_strengths(self):
+        return [self.state_strength(state) for state in self.q.keys()]
+
     def recent_scores_mean(self, n=1_000):
         return self.recent_field_mean(field="score", n=n)
 
@@ -87,6 +91,16 @@ class SnakeLearner:
         with open(q_file_path, mode="r") as fd:
             new_q = json.load(fd)
         self.q.update({key: np.array(val) for key, val in new_q.items()})
+
+    def clear_states_by_strength(self, min_strength):
+        strong_states = [
+            state for state in self.q.keys()
+            if self.state_strength(state) > min_strength
+        ]
+        self.q = {
+            state: state_value for state, state_value in self.q.items()
+            if state in strong_states
+        }
 
     def build_board(self):
         return SnakeBoard(
@@ -173,3 +187,6 @@ class SnakeLearner:
         state = self.view_getter.get_view(board)
         best_next_action = np.argmax(self.q[state])
         return self.q[state][best_next_action]
+
+    def state_strength(self, state):
+        return np.linalg.norm(self.q[state])

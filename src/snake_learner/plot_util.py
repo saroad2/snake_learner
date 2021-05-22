@@ -15,6 +15,15 @@ def plot_values_history(values, title, xlabel, ylabel, output_path):
     fig.savefig(output_path)
 
 
+def plot_values_histogram(values, title, xlabel, bins, output_path):
+    fig, ax = plt.subplots()
+    ax.hist(values, bins=bins)
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel("Count")
+    fig.savefig(output_path)
+
+
 def plot_field_history(history, output_dir, field):
     field_title = field.replace("_", " ").title()
     plot_values_history(
@@ -65,12 +74,11 @@ def plot_int_field_histogram(history, output_dir, field):
 
 
 def plot_float_field_histogram(history, output_dir, field, bins):
-    values = [history_point[field] for history_point in history]
-    fig, ax = plt.subplots()
-
-    ax.hist(values, bins=bins)
     field_title = field.replace("_", " ").title()
-    ax.set_title(f"{field_title} Histogram")
-    ax.set_xlabel(field_title)
-    ax.set_ylabel("Count")
-    fig.savefig(output_dir / f"{field}_histogram.png")
+    plot_values_histogram(
+        values=[history_point[field] for history_point in history],
+        title=f"{field_title} Histogram",
+        xlabel=field_title,
+        output_path=output_dir / f"{field}_histogram.png",
+        bins=bins
+    )
