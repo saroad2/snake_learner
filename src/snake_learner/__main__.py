@@ -43,12 +43,18 @@ def snake():
     default=1000,
     help="Window size for mean calculation in plots",
 )
+@click.option(
+    "--animation-output-type",
+    type=click.Choice(["gif", "mp4"], case_sensitive=False),
+    default="gif"
+)
 def train_snake(
     output_dir,
     q_file,
     configuration_file,
     iterations,
     plot_window,
+    animation_output_type,
 ):
     output_dir = Path(output_dir)
     output_dir.mkdir(exist_ok=True)
@@ -168,6 +174,9 @@ def train_snake(
         history=learner.history,
         output_dir=output_dir,
         field="states",
+    )
+    SnakeAnimation(history=learner.best_game.history).save(
+        Path(output_dir) / f"snake_game.{animation_output_type}"
     )
     shutil.copyfile(configuration_file, output_dir / "configuration.json")
     with open(output_dir / "q_values.json", mode="w") as fd:

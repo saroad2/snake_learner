@@ -43,6 +43,7 @@ class SnakeLearner:
         self.move_reward = move_reward
 
         self.history = []
+        self.best_game = None
 
     @property
     def max_score(self):
@@ -113,6 +114,8 @@ class SnakeLearner:
                 velocity=board.score / board.moves,
             )
         )
+        if self.best_game is None or board.score > self.best_game.score:
+            self.best_game = board
 
     def play(self):
         board = self.build_board()
