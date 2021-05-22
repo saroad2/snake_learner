@@ -200,18 +200,27 @@ def train_snake(
     type=click.Choice(["gif", "mp4"], case_sensitive=False),
     default="gif"
 )
+@click.option("-e", "--epsilon", type=float, help="Override epsilon value.")
 def play_snake(
-    q_file, configuration_file, output_dir, rows, columns, best_of, output_type
+    q_file,
+    configuration_file,
+    output_dir,
+    rows,
+    columns,
+    best_of,
+    epsilon,
+    output_type
 ):
     with open(configuration_file, mode="r") as fd:
         configuration = json.load(fd)
     view_getter = DistancesViewGetter(
         sight_distance=configuration.pop("sight_distance", None)
     )
-    if rows is not None:
-        configuration["rows"] = rows
-    if columns is not None:
-        configuration["columns"] = columns
+    extra_config = dict(rows=rows, columns=columns, epsilon=epsilon)
+    extra_config = {
+        key: value for key, value in extra_config.items() if value is not None
+    }
+    configuration.update(extra_config)
     learner = SnakeLearner(view_getter=view_getter, **configuration)
     learner.load_q_from_file(q_file)
     if best_of is None:
