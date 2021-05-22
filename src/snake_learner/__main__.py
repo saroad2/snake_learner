@@ -71,10 +71,13 @@ def train_snake(
         try:
             for _ in bar:
                 learner.run_train_iteration()
+                score_mean = learner.recent_scores_mean(plot_window)
+                rewards_mean = learner.recent_rewards_mean(plot_window)
+                duration_mean = learner.recent_duration_mean(plot_window)
                 bar.label = (
-                    f"Recent scores mean - {learner.recent_scores_mean():.2f}, "
-                    f"Recent rewards mean - {learner.recent_rewards_mean():.2f}, "
-                    f"Recent durations mean - {learner.recent_duration_mean():.2f}, "
+                    f"Recent scores mean - {score_mean :.2f}, "
+                    f"Recent rewards mean - {rewards_mean :.2f}, "
+                    f"Recent durations mean - {duration_mean :.2f}, "
                     f"States - {learner.states_number}"
                 )
         except KeyboardInterrupt:
